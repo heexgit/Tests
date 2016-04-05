@@ -5,6 +5,16 @@ VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebDaoTests", "WebDaoTests.csproj", "{8A0E89AD-11EE-4452-B214-31F07E553BC1}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExpertSender", "ExpertSender", "{A637231F-B229-4838-B384-B891840B577D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpertSender.Common", "..\..\tfs\ExpertSender 2\Dev\Dev\Src\ExpertSender.Common\ExpertSender.Common.csproj", "{58CC1440-50B4-41C8-98F4-D259250FC53E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpertSender.DataModel", "..\..\tfs\ExpertSender 2\Dev\Dev\Src\ExpertSender.DataModel\ExpertSender.DataModel.csproj", "{F366DEC6-9E94-440C-AA52-813E2F477FE6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpertSender.DAL", "..\..\tfs\ExpertSender 2\Dev\Dev\Src\ExpertSender.DAL\ExpertSender.DAL.csproj", "{747F4AE2-FC01-4A2C-B8BC-61E2D0B875FB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpertSender.Lib", "..\..\tfs\ExpertSender 2\Dev\Dev\Src\ExpertSender.Lib\ExpertSender.Lib.csproj", "{45E2FD1F-80B2-4053-9ED6-07EB481AD834}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,8 +25,30 @@ Global
 		{8A0E89AD-11EE-4452-B214-31F07E553BC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8A0E89AD-11EE-4452-B214-31F07E553BC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8A0E89AD-11EE-4452-B214-31F07E553BC1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58CC1440-50B4-41C8-98F4-D259250FC53E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58CC1440-50B4-41C8-98F4-D259250FC53E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58CC1440-50B4-41C8-98F4-D259250FC53E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58CC1440-50B4-41C8-98F4-D259250FC53E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F366DEC6-9E94-440C-AA52-813E2F477FE6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F366DEC6-9E94-440C-AA52-813E2F477FE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F366DEC6-9E94-440C-AA52-813E2F477FE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F366DEC6-9E94-440C-AA52-813E2F477FE6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{747F4AE2-FC01-4A2C-B8BC-61E2D0B875FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{747F4AE2-FC01-4A2C-B8BC-61E2D0B875FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{747F4AE2-FC01-4A2C-B8BC-61E2D0B875FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{747F4AE2-FC01-4A2C-B8BC-61E2D0B875FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{45E2FD1F-80B2-4053-9ED6-07EB481AD834}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{45E2FD1F-80B2-4053-9ED6-07EB481AD834}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{45E2FD1F-80B2-4053-9ED6-07EB481AD834}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{45E2FD1F-80B2-4053-9ED6-07EB481AD834}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{58CC1440-50B4-41C8-98F4-D259250FC53E} = {A637231F-B229-4838-B384-B891840B577D}
+		{F366DEC6-9E94-440C-AA52-813E2F477FE6} = {A637231F-B229-4838-B384-B891840B577D}
+		{747F4AE2-FC01-4A2C-B8BC-61E2D0B875FB} = {A637231F-B229-4838-B384-B891840B577D}
+		{45E2FD1F-80B2-4053-9ED6-07EB481AD834} = {A637231F-B229-4838-B384-B891840B577D}
 	EndGlobalSection
 EndGlobal

@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-configuration xmlns="urn:nhibernate-configuration-2.2">
+  <session-factory>
+    <property name="connection.provider">ExpertSender.DAL.Core.DynamicConnectionProvider, ExpertSender.DAL</property>
+    <property name="dialect">NHibernate.Dialect.MsSql2008Dialect</property>
+    <property name="connection.driver_class">NHibernate.Driver.SqlClientDriver</property>
+    <property name="connection.connection_string">Data Source=sql-devel;Initial Catalog=ES_TR_Common;Integrated Security=true</property>
+    <property name="current_session_context_class">web</property>
+    <property name="command_timeout">360</property>
+    <property name="prepare_sql">true</property>
+    <property name="linqtohql.generatorsregistry">ExpertSender.DAL.Core.AdditionalMethodsGenerator, ExpertSender.DAL</property>
+    <mapping assembly="ExpertSender.DataModel" />
+  </session-factory>
+</hibernate-configuration>

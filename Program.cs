@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+using WebDaoTests.Tests;
 
 namespace WebDaoTests
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
-            var a = 1;
+            new UserDaoTests().Start();
         }
     }
 }

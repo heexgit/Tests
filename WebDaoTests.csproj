@@ -33,6 +33,22 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Iesi.Collections, Version=4.0.0.0, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <HintPath>packages\Iesi.Collections.4.0.0.4000\lib\net40\Iesi.Collections.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NHibernate, Version=4.0.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <HintPath>packages\NHibernate.4.0.4.4000\lib\net40\NHibernate.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="StructureMap, Version=4.1.1.372, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\structuremap.4.1.1.372\lib\net40\StructureMap.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="StructureMap.Net4, Version=4.1.1.372, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\structuremap.4.1.1.372\lib\net40\StructureMap.Net4.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -43,13 +59,42 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\InfrastructureRegistry.cs" />
+    <Compile Include="Mocks\AppContext.mock.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Core\Tester.base.cs" />
+    <Compile Include="Tests\UserDaoTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\tfs\ExpertSender 2\Dev\Dev\Src\ExpertSender.Common\ExpertSender.Common.csproj">
+      <Project>{58cc1440-50b4-41c8-98f4-d259250fc53e}</Project>
+      <Name>ExpertSender.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\tfs\ExpertSender 2\Dev\Dev\Src\ExpertSender.DAL\ExpertSender.DAL.csproj">
+      <Project>{747f4ae2-fc01-4a2c-b8bc-61e2d0b875fb}</Project>
+      <Name>ExpertSender.DAL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\tfs\ExpertSender 2\Dev\Dev\Src\ExpertSender.DataModel\ExpertSender.DataModel.csproj">
+      <Project>{f366dec6-9e94-440c-aa52-813e2f477fe6}</Project>
+      <Name>ExpertSender.DataModel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\tfs\ExpertSender 2\Dev\Dev\Src\ExpertSender.Lib\ExpertSender.Lib.csproj">
+      <Project>{45e2fd1f-80b2-4053-9ed6-07eb481ad834}</Project>
+      <Name>ExpertSender.Lib</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="hibernate.cfg.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>copy /Y $(ProjectDir)hibernate.cfg.xml $(TargetDir)hibernate.cfg.xml</PreBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
