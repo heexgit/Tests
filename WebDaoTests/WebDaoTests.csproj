@@ -9,9 +9,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>WebDaoTests</RootNamespace>
     <AssemblyName>WebDaoTests</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -60,10 +61,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\InfrastructureRegistry.cs" />
-    <Compile Include="Mocks\AppContext.mock.cs" />
+    <Compile Include="Mocks\EsAppContext.mock.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\Tester.base.cs" />
+    <Compile Include="Tests\MessageContentDaoTests.cs" />
+    <Compile Include="Tests\AnyQueryTests.cs" />
     <Compile Include="Tests\UserDaoTests.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -73,23 +76,21 @@
   <ItemGroup>
     <Content Include="hibernate.cfg.xml" />
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <Folder Include="WebDaoTests\" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\tfs\ExpertSender 2\Dev\Dev\Src\ExpertSender.Common\ExpertSender.Common.csproj">
+    <ProjectReference Include="..\..\..\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.Common\ExpertSender.Common.csproj">
       <Project>{58cc1440-50b4-41c8-98f4-d259250fc53e}</Project>
       <Name>ExpertSender.Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\tfs\ExpertSender 2\Dev\Dev\Src\ExpertSender.DAL\ExpertSender.DAL.csproj">
+    <ProjectReference Include="..\..\..\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.DAL\ExpertSender.DAL.csproj">
       <Project>{747f4ae2-fc01-4a2c-b8bc-61e2d0b875fb}</Project>
       <Name>ExpertSender.DAL</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\tfs\ExpertSender 2\Dev\Dev\Src\ExpertSender.DataModel\ExpertSender.DataModel.csproj">
+    <ProjectReference Include="..\..\..\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.DataModel\ExpertSender.DataModel.csproj">
       <Project>{f366dec6-9e94-440c-aa52-813e2f477fe6}</Project>
       <Name>ExpertSender.DataModel</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\tfs\ExpertSender 2\Dev\Dev\Src\ExpertSender.Lib\ExpertSender.Lib.csproj">
+    <ProjectReference Include="..\..\..\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.Lib\ExpertSender.Lib.csproj">
       <Project>{45e2fd1f-80b2-4053-9ed6-07eb481ad834}</Project>
       <Name>ExpertSender.Lib</Name>
     </ProjectReference>

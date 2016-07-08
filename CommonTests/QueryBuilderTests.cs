@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using ExpertSender.Common.Dao;
 using ExpertSender.Common.Entities;
 using ExpertSender.Common.QueryBuilder;
@@ -165,7 +166,42 @@ namespace CommonTests
         }
         #endregion
 
-        private static FrontQueryBuilder NewQueryBuilder => new FrontQueryBuilder(new DapperMediator());
+        #region SELECT
+        [TestMethod]
+        public void Select_Basic_Test()
+        {
+            var actual = NewQueryBuilder
+                .Select("Id, StringValue, IntValue, DateTimeValue")
+                .From(MockEntityName)
+                .Where(new { Name = "Ala", Age = 12 })
+                .GetQuery();
+
+            var expected = $@"SELECT Id, StringValue, IntValue, DateTimeValue FROM {MockEntityName} WHERE Name=@Name AND Age=@Age";
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void Select_WherePattern_Test()
+        {
+            var actual = NewQueryBuilder
+                .Select(new SelectBuilder(new {Id = 0, TableName = string.Empty}))
+		        .From($"{MockEntityName} WITH(READPAST)")
+		        .Where(new WhereBuilder().Where("LastUpdate < {0}", new
+		        {
+                    // interesują nas tablice, które nie były używane od 1 dnia
+		            Date = DateTime.UtcNow.AddDays(-1)
+		        }))
+                .GetQuery();
+
+            var expected = $@"SELECT Id,TableName FROM {MockEntityName} WITH(READPAST) WHERE LastUpdate < @Date";
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        #endregion
+
+        private static ClauseInitiator NewQueryBuilder => new ClauseInitiator(new DapperMediator());
 
         private static string MockEntityName => typeof(MockEntity).Name;
         private static string MockComplexEntityName => typeof(MockComplexEntity).Name;

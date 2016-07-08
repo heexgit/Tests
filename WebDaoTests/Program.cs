@@ -3,11 +3,13 @@ using WebDaoTests.Tests;
 
 namespace WebDaoTests
 {
-    class Program
+    internal class Program
     {
-        static void Main()
+        private static void Main()
         {
             new UserDaoTests().Start();
+            new MessageContentDaoTests().Start();
+            new AnyQueryTests().Start();
         }
     }
 }

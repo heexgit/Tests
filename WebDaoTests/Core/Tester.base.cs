@@ -1,4 +1,5 @@
-﻿using ExpertSender.Common.Helpers;
+﻿using ExpertSender.Common;
+using ExpertSender.Common.Helpers;
 using ExpertSender.DAL.Core;
 using ExpertSender.DAL.Registry;
 using NHibernate;
@@ -6,7 +7,7 @@ using StructureMap;
 
 namespace WebDaoTests.Core
 {
-    abstract class Tester
+    internal abstract class Tester
     {
         protected IContainer Container { get; private set; }
         private ISessionFactory _sessionFactory;
@@ -14,7 +15,15 @@ namespace WebDaoTests.Core
         protected Tester()
         {
             PrepareContainer();
-            StaticsProvider.Container = Container;
+
+            PrepareNHibernate();
+        }
+
+        protected Tester(IEsAppContext appContext)
+        {
+            PrepareContainer();
+
+            Container.Inject(appContext);
 
             PrepareNHibernate();
         }
@@ -31,15 +40,19 @@ namespace WebDaoTests.Core
 
         private void PrepareContainer()
         {
-            Container = new Container(c =>
+            Container = (IContainer)ReflectionHelper.GetValueOfPrivateStaticField(typeof(StaticsProvider), "_container");
+            if (Container == null)
             {
-                c.AddRegistry<InfrastructureRegistry>();
-                c.AddRegistry<DaoRegistry>();
+                Container = new Container(c =>
+                {
+                    c.AddRegistry<InfrastructureRegistry>();
+                    c.AddRegistry<DaoRegistry>();
 
-                c.Policies.FillAllPropertiesOfType<IContainer>();
-                c.Policies.FillAllPropertiesOfType<ISession>().Use(context => GetContextSession(context));
+                    c.Policies.FillAllPropertiesOfType<IContainer>();
+                    c.Policies.FillAllPropertiesOfType<ISession>().Use(context => GetContextSession(context));
+                });
+                StaticsProvider.Container = Container;
             }
-            );
         }
 
         /// <summary>

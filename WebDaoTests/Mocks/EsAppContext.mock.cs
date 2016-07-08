@@ -3,7 +3,7 @@ using ExpertSender.Common;
 
 namespace WebDaoTests.Mocks
 {
-    public class AppContext : IAppContext
+    public class EsAppContext : IEsAppContext
     {
         public int? CurrentAccountId { get; set; }
         public int? CurrentServiceId { get; set; }

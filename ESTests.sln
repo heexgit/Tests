@@ -7,13 +7,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebDaoTests", "WebDaoTests\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExpertSender", "ExpertSender", "{A637231F-B229-4838-B384-B891840B577D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpertSender.Common", "..\tfs\ExpertSender 2\Dev\Dev\Src\ExpertSender.Common\ExpertSender.Common.csproj", "{58CC1440-50B4-41C8-98F4-D259250FC53E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpertSender.Common", "..\..\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.Common\ExpertSender.Common.csproj", "{58CC1440-50B4-41C8-98F4-D259250FC53E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpertSender.DataModel", "..\tfs\ExpertSender 2\Dev\Dev\Src\ExpertSender.DataModel\ExpertSender.DataModel.csproj", "{F366DEC6-9E94-440C-AA52-813E2F477FE6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpertSender.DataModel", "..\..\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.DataModel\ExpertSender.DataModel.csproj", "{F366DEC6-9E94-440C-AA52-813E2F477FE6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpertSender.DAL", "..\tfs\ExpertSender 2\Dev\Dev\Src\ExpertSender.DAL\ExpertSender.DAL.csproj", "{747F4AE2-FC01-4A2C-B8BC-61E2D0B875FB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpertSender.DAL", "..\..\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.DAL\ExpertSender.DAL.csproj", "{747F4AE2-FC01-4A2C-B8BC-61E2D0B875FB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpertSender.Lib", "..\tfs\ExpertSender 2\Dev\Dev\Src\ExpertSender.Lib\ExpertSender.Lib.csproj", "{45E2FD1F-80B2-4053-9ED6-07EB481AD834}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpertSender.Lib", "..\..\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.Lib\ExpertSender.Lib.csproj", "{45E2FD1F-80B2-4053-9ED6-07EB481AD834}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonTests", "CommonTests\CommonTests.csproj", "{956A0E50-9379-4C5D-BC3A-716473E8F6A6}"
 EndProject

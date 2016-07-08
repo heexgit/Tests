@@ -1,4 +1,5 @@
-﻿using ExpertSender.DataModel.Dao;
+﻿using ExpertSender.Common;
+using ExpertSender.DataModel.Dao;
 using WebDaoTests.Core;
 
 namespace WebDaoTests.Tests
@@ -7,6 +8,9 @@ namespace WebDaoTests.Tests
     {
         public override void Start()
         {
+            var app = Container.GetInstance<IEsAppContext>();
+            app.CurrentServiceId = 1;
+
             GetAllTest();
         }
 

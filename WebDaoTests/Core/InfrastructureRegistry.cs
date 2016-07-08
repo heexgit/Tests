@@ -38,7 +38,7 @@ namespace WebDaoTests.Core
 
             //For<ModelMetadataProvider>().Use<EsDataAnnotationsModelMetadataProvider>();
 
-            For<IAppContext>().Use<Mocks.AppContext>();
+            For<IEsAppContext>().Use<Mocks.EsAppContext>();
             //For<IAppContext>().HttpContextScoped().Use<AppContext>();
 
             //For<ITempDataProvider>().Use<CacheTempDataProvider>();
