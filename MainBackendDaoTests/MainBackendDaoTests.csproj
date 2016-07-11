@@ -4,15 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{4A5BC10C-3D6F-4D66-B226-7C3563E40A72}</ProjectGuid>
+    <ProjectGuid>{F6A1B41B-E123-49ED-87D1-3922D7430F8C}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BackendDaoTests</RootNamespace>
-    <AssemblyName>BackendDaoTests</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <RootNamespace>MainBackendDaoTests</RootNamespace>
+    <AssemblyName>MainBackendDaoTests</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -38,6 +37,21 @@
       <HintPath>..\packages\Dapper.1.42\lib\net45\Dapper.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="ExpertSender.Backend.DAL">
+      <HintPath>..\..\..\vso\ExpertSender 2\Main\Src\ExpertSender.Backend.DAL\bin\Debug\ExpertSender.Backend.DAL.dll</HintPath>
+    </Reference>
+    <Reference Include="ExpertSender.Backend.Host">
+      <HintPath>..\..\..\vso\ExpertSender 2\Main\Src\ExpertSender.Backend.Host\obj\Debug\ExpertSender.Backend.Host.dll</HintPath>
+    </Reference>
+    <Reference Include="ExpertSender.Common">
+      <HintPath>..\..\..\vso\ExpertSender 2\Main\Src\ExpertSender.Common\bin\Debug\ExpertSender.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="ExpertSender.DataModel">
+      <HintPath>..\..\..\vso\ExpertSender 2\Main\Src\ExpertSender.Backend.DAL\bin\Debug\ExpertSender.DataModel.dll</HintPath>
+    </Reference>
+    <Reference Include="ExpertSender.Lib">
+      <HintPath>..\..\..\vso\ExpertSender 2\Main\Src\ExpertSender.Lib\bin\Debug\ExpertSender.Lib.dll</HintPath>
+    </Reference>
     <Reference Include="StructureMap, Version=4.2.0.402, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\structuremap.4.2.0.402\lib\net40\StructureMap.dll</HintPath>
       <Private>True</Private>
@@ -47,6 +61,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -61,37 +76,12 @@
     <Compile Include="Mocks\EsAppContext.mock.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Tests\SubscriberDaoTests.cs" />
     <Compile Include="Tests\TriggerDaoTests.cs" />
-    <Compile Include="Tests\MessageContentDaoTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.Backend.DAL\ExpertSender.Backend.DAL.csproj">
-      <Project>{2722acd8-8c8a-440d-9415-abac8c361c9c}</Project>
-      <Name>ExpertSender.Backend.DAL</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.Backend.Host\ExpertSender.Backend.Host.csproj">
-      <Project>{c9e6bcdd-892d-4123-9859-c529a22f0ccf}</Project>
-      <Name>ExpertSender.Backend.Host</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.Common\ExpertSender.Common.csproj">
-      <Project>{58cc1440-50b4-41c8-98f4-d259250fc53e}</Project>
-      <Name>ExpertSender.Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.DataModel\ExpertSender.DataModel.csproj">
-      <Project>{f366dec6-9e94-440c-aa52-813e2f477fe6}</Project>
-      <Name>ExpertSender.DataModel</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.Lib\ExpertSender.Lib.csproj">
-      <Project>{45e2fd1f-80b2-4053-9ed6-07eb481ad834}</Project>
-      <Name>ExpertSender.Lib</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

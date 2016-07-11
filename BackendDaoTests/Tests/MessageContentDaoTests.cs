@@ -7,12 +7,12 @@ namespace BackendDaoTests.Tests
 {
     internal class MessageContentDaoTests : Tester
     {
-        private const int CurrentServiceId = 1;
+        private const int CurrentUnitId = 1;
 
         public MessageContentDaoTests()
             : base(new EsAppContext
             {
-                CurrentServiceId = CurrentServiceId
+                CurrentServiceId = CurrentUnitId
             })
         { }
 
@@ -24,7 +24,7 @@ namespace BackendDaoTests.Tests
 
         public void SelectTest()
         {
-            var dao = Container.GetInstance<IMessageContentDao>().Use(CurrentServiceId);
+            var dao = Container.GetInstance<IMessageContentDao>().Use(CurrentUnitId);
                 
             var selectBuilder = new SelectBuilder("Subject");
             selectBuilder.From("MessageContent").Where(new { MessageId = 110, IsDeleted = false });
@@ -35,7 +35,7 @@ namespace BackendDaoTests.Tests
 
         public void InsertTest()
         {
-            var dao = Container.GetInstance<IMessageContentDao>().Use(CurrentServiceId);
+            var dao = Container.GetInstance<IMessageContentDao>().Use(CurrentUnitId);
                 
             var insertBuilder = new InsertBuilder("MessageContent").Values(new ValuesBuilder(new
             {

@@ -7,6 +7,8 @@ namespace BackendDaoTests
         private static void Main()
         {
             new MessageContentDaoTests().Start();
+            new TriggerDaoTests().Start();
+            new SubscriberDaoTests().Start();
         }
     }
 }
