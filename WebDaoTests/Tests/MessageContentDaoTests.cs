@@ -27,7 +27,7 @@ namespace WebDaoTests.Tests
             var dao = Container.GetInstance<IMessageContentDao>();
                 
             var selectBuilder = new SelectBuilder("Subject");
-            selectBuilder.From("MessageContent").Where(new { MessageId = 6, IsDeleted = false });
+            selectBuilder.From("MessageContent").Where(new { MessageId = 110, IsDeleted = false });
             var result = dao.Use(CurrentServiceId).SelectOne(selectBuilder);
         }
 
