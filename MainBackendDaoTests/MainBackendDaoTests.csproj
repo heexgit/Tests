@@ -47,7 +47,7 @@
       <HintPath>..\..\..\vso\ExpertSender 2\Main\Src\ExpertSender.Common\bin\Debug\ExpertSender.Common.dll</HintPath>
     </Reference>
     <Reference Include="ExpertSender.DataModel">
-      <HintPath>..\..\..\vso\ExpertSender 2\Main\Src\ExpertSender.Backend.DAL\bin\Debug\ExpertSender.DataModel.dll</HintPath>
+      <HintPath>..\..\..\vso\ExpertSender 2\Main\Src\ExpertSender.DataModel\bin\Debug\ExpertSender.DataModel.dll</HintPath>
     </Reference>
     <Reference Include="ExpertSender.Lib">
       <HintPath>..\..\..\vso\ExpertSender 2\Main\Src\ExpertSender.Lib\bin\Debug\ExpertSender.Lib.dll</HintPath>
@@ -76,6 +76,7 @@
     <Compile Include="Mocks\EsAppContext.mock.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tests\ShipmentDaoTests.cs" />
     <Compile Include="Tests\TriggerDaoTests.cs" />
   </ItemGroup>
   <ItemGroup>

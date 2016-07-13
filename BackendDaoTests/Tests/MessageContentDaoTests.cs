@@ -19,7 +19,7 @@ namespace BackendDaoTests.Tests
         public override void Start()
         {
             SelectTest();
-            InsertTest();
+            //InsertTest();
         }
 
         public void SelectTest()

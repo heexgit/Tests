@@ -7,6 +7,7 @@ namespace MainBackendDaoTests
         private static void Main()
         {
             new TriggerDaoTests().Start();
+            new ShipmentDaoTests().Start();
         }
     }
 }

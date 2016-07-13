@@ -22,7 +22,7 @@ namespace BackendDaoTests.Tests
         public override void Start()
         {
             IsTriggerSubscriberTest();
-            CreateTriggerSubscribersTest();
+            //CreateTriggerSubscribersTest();
         }
 
         public void IsTriggerSubscriberTest()
