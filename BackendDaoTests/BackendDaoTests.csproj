@@ -61,6 +61,7 @@
     <Compile Include="Mocks\EsAppContext.mock.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tests\AnyQueryTests.cs" />
     <Compile Include="Tests\SubscriberDaoTests.cs" />
     <Compile Include="Tests\TriggerDaoTests.cs" />
     <Compile Include="Tests\MessageContentDaoTests.cs" />

@@ -9,6 +9,7 @@ namespace BackendDaoTests
             new MessageContentDaoTests().Start();
             new TriggerDaoTests().Start();
             new SubscriberDaoTests().Start();
+            new AnyQueryTests().Start();
         }
     }
 }

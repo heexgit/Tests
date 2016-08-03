@@ -199,6 +199,99 @@ namespace CommonTests
             Assert.AreEqual(expected, actual);
         }
 
+        [TestMethod]
+        public void Select_Join_Test()
+        {
+            var actual = NewQueryBuilder
+                .Select(new SelectBuilder(new {Id = 0, TableName = string.Empty}))
+		        .From($"{MockEntityName}")
+                .Join(new JoinBuilder($"{MockEntityName}Joined")).On(new OnBuilder($"{MockEntityName}Joined.ParentId = {MockEntityName}.Id"))
+		        .Where(new WhereBuilder().Where("LastUpdate < {0}", new
+		        {
+		            Date = DateTime.Now
+		        }))
+                .GetQuery();
+
+            var expected = $@"SELECT Id,TableName FROM {MockEntityName} JOIN {MockEntityName}Joined ON {MockEntityName}Joined.ParentId = {MockEntityName}.Id WHERE LastUpdate < @Date";
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void Select_AliasJoin_Test()
+        {
+            var actual = NewQueryBuilder
+                .Select(new SelectBuilder(new {Id = 0, TableName = string.Empty}))
+		        .From(new FromBuilder($"{MockEntityName}", "p"))
+                .Join(new JoinBuilder($"{MockEntityName}Joined", "j")).On(new OnBuilder("j.ParentId = p.Id"))
+		        .Where(new WhereBuilder().Where("LastUpdate < {0}", new
+		        {
+		            Date = DateTime.Now
+		        }))
+                .GetQuery();
+
+            var expected = $@"SELECT Id,TableName FROM {MockEntityName} p JOIN {MockEntityName}Joined j ON j.ParentId = p.Id WHERE LastUpdate < @Date";
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void Select_AliasJoinSelectMulti_Test()
+        {
+            var actual = NewQueryBuilder
+                .Select(new SelectBuilder(new {p_Id = 0, j_TableName = string.Empty}))
+		        .From(new FromBuilder($"{MockEntityName}", "p"))
+                .Join(new JoinBuilder($"{MockEntityName}Joined", "j")).On(new OnBuilder("j.ParentId = p.Id"))
+		        .Where(new WhereBuilder().Where("LastUpdate < {0}", new
+		        {
+		            Date = DateTime.Now
+		        }))
+                .GetQuery();
+
+            var expected = $@"SELECT p.Id AS p_Id,j.TableName AS j_TableName FROM {MockEntityName} p JOIN {MockEntityName}Joined j ON j.ParentId = p.Id WHERE LastUpdate < @Date";
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void Select_AliasJoinWhereMulti_Test()
+        {
+            var actual = NewQueryBuilder
+                .Select(new SelectBuilder(new {Id = 0, TableName = string.Empty}))
+		        .From(new FromBuilder($"{MockEntityName}", "p"))
+                .Join(new JoinBuilder($"{MockEntityName}Joined", "j")).On(new OnBuilder("j.ParentId = p.Id"))
+		        .Where(new WhereBuilder().Where("p.LastUpdate<{0} AND p.Name={1}", new
+		        {
+		            Date = DateTime.Now,
+                    p_Name = "Ala"
+		        }))
+                .GetQuery();
+
+            var expected = $@"SELECT Id,TableName FROM {MockEntityName} p JOIN {MockEntityName}Joined j ON j.ParentId = p.Id WHERE p.LastUpdate<@Date AND p.Name=@p_Name";
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void Select_AliasJoinByIds_Test()
+        {
+            var ids = new []{ 3, 4, 8};
+
+            var actual = NewQueryBuilder
+                .Select(new SelectBuilder(new {Id = 0, TableName = string.Empty}))
+		        .From(new FromBuilder($"{MockEntityName}", "p"))
+                .Join(new JoinBuilder($"{MockEntityName}Joined", "j")).On(new OnBuilder("j.ParentId = p.Id"))
+		        .Where(new WhereBuilder().Where("p.Id IN {0}", new
+		        {
+		            Ids = ids
+		        }))
+                .GetQuery();
+
+            var expected = $@"SELECT Id,TableName FROM {MockEntityName} p JOIN {MockEntityName}Joined j ON j.ParentId = p.Id WHERE p.Id IN @Ids";
+
+            Assert.AreEqual(expected, actual);
+        }
+
         #endregion
 
         private static ClauseInitiator NewQueryBuilder => new ClauseInitiator(new DapperMediator());
