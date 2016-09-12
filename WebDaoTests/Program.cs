@@ -7,9 +7,11 @@ namespace WebDaoTests
     {
         private static void Main()
         {
-            new UserDaoTests().Start();
-            new MessageContentDaoTests().Start();
-            new AnyQueryTests().Start();
+            //new SubscriberDaoTests().Start();
+            //new UserDaoTests().Start();
+            //new MessageContentDaoTests().Start();
+            //new AnyQueryTests().Start();
+            new FactExtendedPropertiesDaoTests().Start();
         }
     }
 }

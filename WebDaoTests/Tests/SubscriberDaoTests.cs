@@ -4,20 +4,20 @@ using WebDaoTests.Core;
 
 namespace WebDaoTests.Tests
 {
-    internal class UserDaoTests : Tester
+    internal class SubscriberDaoTests : Tester
     {
         public override void Start()
         {
             var app = Container.GetInstance<IEsAppContext>();
             app.CurrentServiceId = 1;
 
-            GetAllTest();
+            GetTest();
         }
 
-        public void GetAllTest()
+        public void GetTest()
         {
-            var dao = Container.GetInstance<IUserDao>();
-            var all = dao.GetAll();
+            var dao = Container.GetInstance<ISubscriberDao>();
+            var one = dao.Get(20);
         }
     }
 }

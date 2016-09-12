@@ -65,8 +65,10 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\Tester.base.cs" />
+    <Compile Include="Tests\FactExtendedPropertiesDaoTests.cs" />
     <Compile Include="Tests\MessageContentDaoTests.cs" />
     <Compile Include="Tests\AnyQueryTests.cs" />
+    <Compile Include="Tests\SubscriberDaoTests.cs" />
     <Compile Include="Tests\UserDaoTests.cs" />
   </ItemGroup>
   <ItemGroup>
