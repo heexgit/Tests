@@ -1,16 +1,22 @@
-﻿using ExpertSender.Common;
-using ExpertSender.DataModel.Dao;
+﻿using ExpertSender.DataModel.Dao;
 using WebDaoTests.Core;
+using EsAppContext = WebDaoTests.Mocks.EsAppContext;
 
 namespace WebDaoTests.Tests
 {
     internal class SubscriberDaoTests : Tester
     {
+        private const int CurrentUnitId = 1;
+
+        public SubscriberDaoTests()
+            : base(new EsAppContext
+            {
+                CurrentServiceId = CurrentUnitId
+            })
+        { }
+
         public override void Start()
         {
-            var app = Container.GetInstance<IEsAppContext>();
-            app.CurrentServiceId = 1;
-
             GetTest();
         }
 

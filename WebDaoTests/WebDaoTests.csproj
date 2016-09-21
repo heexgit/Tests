@@ -69,6 +69,8 @@
     <Compile Include="Tests\MessageContentDaoTests.cs" />
     <Compile Include="Tests\AnyQueryTests.cs" />
     <Compile Include="Tests\SubscriberDaoTests.cs" />
+    <Compile Include="Tests\DomainDaoTests.cs" />
+    <Compile Include="Tests\TagDaoTests.cs" />
     <Compile Include="Tests\UserDaoTests.cs" />
   </ItemGroup>
   <ItemGroup>

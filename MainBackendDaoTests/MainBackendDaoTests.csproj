@@ -76,6 +76,7 @@
     <Compile Include="Mocks\EsAppContext.mock.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tests\DomainDaoTests.cs" />
     <Compile Include="Tests\ShipmentDaoTests.cs" />
     <Compile Include="Tests\TriggerDaoTests.cs" />
   </ItemGroup>

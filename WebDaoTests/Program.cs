@@ -11,7 +11,9 @@ namespace WebDaoTests
             //new UserDaoTests().Start();
             //new MessageContentDaoTests().Start();
             //new AnyQueryTests().Start();
-            new FactExtendedPropertiesDaoTests().Start();
+            //new FactExtendedPropertiesDaoTests().Start();
+            //new DomainDaoTests().Start();
+            new TagDaoTests().Start();
         }
     }
 }

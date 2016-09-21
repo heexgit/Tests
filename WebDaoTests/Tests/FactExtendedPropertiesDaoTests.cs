@@ -19,11 +19,11 @@ namespace WebDaoTests.Tests
         {
             SaveBrowserVersionTest();
             //SaveBrowserVersion2Test();
-            SaveClientLanguageTest();
-            SaveClientLanguage2Test();
+            //SaveClientLanguageTest();
+            //SaveClientLanguage2Test();
             //SaveClientLanguage3Test();
-            SaveDeviceVersionTest();
-            SaveDeviceVersion2Test();
+            //SaveDeviceVersionTest();
+            //SaveDeviceVersion2Test();
         }
 
         public void SaveBrowserVersionTest()
