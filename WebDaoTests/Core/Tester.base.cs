@@ -51,7 +51,7 @@ namespace WebDaoTests.Core
 
                     c.Policies.FillAllPropertiesOfType<IContainer>();
                     c.Policies.FillAllPropertiesOfType<ISession>()
-                        .Singleton()// zapewniamy jedną instancję ISession dla wszystkich wywołań
+                        .Singleton() // zapewniamy jedną instancję ISession dla wszystkich wywołań
                         .Use(context => GetContextSession(context));
                 });
                 StaticsProvider.Container = Container;

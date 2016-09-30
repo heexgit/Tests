@@ -2,17 +2,14 @@
 using WebDaoTests.Core;
 using EsAppContext = WebDaoTests.Mocks.EsAppContext;
 
-namespace WebDaoTests.Tests
+namespace WebDaoTests.TestsDao
 {
     internal class FactExtendedPropertiesDaoTests : Tester
     {
         private const int CurrentUnitId = 1;
 
         public FactExtendedPropertiesDaoTests()
-            : base(new EsAppContext
-            {
-                CurrentServiceId = CurrentUnitId
-            })
+            : base(new EsAppContext { CurrentServiceId = CurrentUnitId })
         { }
 
         public override void Start()

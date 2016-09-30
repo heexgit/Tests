@@ -2,7 +2,11 @@
 using ExpertSender.Common;
 using ExpertSender.Common.Cache;
 using ExpertSender.Common.Helpers;
+using ExpertSender.DataModel.Distributed.Enums;
+using ExpertSender.DataModel.Helpers;
 using ExpertSender.Lib.Cache;
+using MaxMind.GeoIP2;
+using NHibernate;
 using StructureMap;
 
 namespace WebDaoTests.Core
@@ -47,7 +51,7 @@ namespace WebDaoTests.Core
             For<IMemoryStaticCacheProvider>().Use<MemoryCacheProvider>();
 
             // obiekt czytający dane z bazy MaxMind jest kosztowny, więc trzymamy go w pamięci
-            //For<DatabaseReader>().Singleton().Use(ctx => new DatabaseReader(MachineConfig.GetSetting(ColocationSetting.MaxMindDB, true), 0));
+            For<DatabaseReader>().Singleton().Use(ctx => new DatabaseReader(MachineConfig.GetSetting(ColocationSetting.MaxMindDB, true), 0));
 
             For<DateRange>().Use(ctx => new DateRange());
 

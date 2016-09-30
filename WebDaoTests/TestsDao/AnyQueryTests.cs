@@ -2,20 +2,29 @@
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-using ExpertSender.Common;
+using ExpertSender.Common.Dao;
+using ExpertSender.DataModel;
+using ExpertSender.DataModel.Dao;
 using NHibernate;
 using WebDaoTests.Core;
+using EsAppContext = WebDaoTests.Mocks.EsAppContext;
 
-namespace WebDaoTests.Tests
+namespace WebDaoTests.TestsDao
 {
     internal class AnyQueryTests : Tester
     {
+        private const int CurrentUnitId = 1;
+
+        public AnyQueryTests()
+            : base(new EsAppContext { CurrentServiceId = CurrentUnitId })
+        { }
+
         public override void Start()
         {
-            var app = Container.GetInstance<IEsAppContext>();
-            app.CurrentServiceId = 1;
-
-            GetCacheStatusTest();
+            //GetCacheStatusTest();
+            //LoadListSettingDictionary();
+            LoadSubscribedOn();
+            //ChangeSubscribedOn();
         }
 
         private void GetCacheStatusTest()
@@ -84,6 +93,46 @@ namespace WebDaoTests.Tests
             var result = cmd.ExecuteScalar();
 
             return (int?) result ?? 3;
+        }
+
+        //to nie działa
+        //private void LoadListSettingDictionary1()
+        //{
+        //    var listDao = Container.GetInstance<IListDao>();
+        //    var lists = listDao.Find(l => l.Settings, l => l.Id == 8);
+        //    var list = lists.Single();
+        //}
+
+        //to nie działa
+        //private void LoadListSettingDictionary2()
+        //{
+        //    var listDao = Container.GetInstance<IListDao>();
+        //    var lists = listDao.Find(l => l.Settings.Select(s => new { s.Key, s.Value }), l => l.Id == 8);
+        //    var list = lists.Single();
+        //}
+
+        private void LoadSubscribedOn()
+        {
+            var subscribedOn = Container.GetInstance<IWebDao<SubscriberInList>>()
+                    .Find(e => e.SubscribedOn, sil => sil.List.Id == 8 && sil.Subscriber.Id == 4238630)
+                    .Single();
+        }
+
+        private void ChangeSubscribedOn()
+        {
+            var dao = Container.GetInstance<IWebDao<SubscriberInList>>();
+            var subscriberInList = dao
+                    .Find(e => e, sil => sil.List.Id == 8 && sil.Subscriber.Id == 4238630)
+                    .Single();
+            subscriberInList.ConfirmedOn = subscriberInList.ConfirmedOn.Value.AddSeconds(1);
+
+            var dao2 = Container.GetInstance<ISubscriberDao>();
+            var subscriber = dao2.Get(4238630);
+            subscriber.LastMessage = subscriber.LastMessage.Value.AddSeconds(1);
+
+
+            var ses = Container.GetInstance<ISession>();
+            ses.Flush();
         }
     }
 }

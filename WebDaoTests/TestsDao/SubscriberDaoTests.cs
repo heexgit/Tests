@@ -2,7 +2,7 @@
 using WebDaoTests.Core;
 using EsAppContext = WebDaoTests.Mocks.EsAppContext;
 
-namespace WebDaoTests.Tests
+namespace WebDaoTests.TestsDao
 {
     internal class SubscriberDaoTests : Tester
     {
