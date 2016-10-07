@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using ExpertSender.DataModel.Enums;
 using ExpertSender.Lib.SubscriberManager;
@@ -12,11 +13,19 @@ using Resources = ExpertSender.Lib.SubscriberManager.Resources;
 
 namespace WebDaoTests.TestsLib
 {
+    /*
+
+        KOD może się nie buildować ze wzgledu na wycoafanie zmian z DEV
+        rozważyć przełączenie do MULTI
+
+    */
     [TestClass]
     public class SubscriberManagerTests : Tester
     {
         private const int CurrentUnitId = 1;
 
+        private const int ExistSubscriberId = 4238630;
+        private const int NotExistSubscriberId = -1;
         private const string ExistSubscriber = "grzegorz.tylak@expertsender.com";
         private const string NotExistSubscriber = "xyz19872842@expertsender.com";
 
@@ -343,7 +352,7 @@ namespace WebDaoTests.TestsLib
                 }
             }
 
-            Assert.AreEqual(true, result.WasReAddedToList);
+            Assert.AreEqual(true, result.WasReAddedToList && result.SubscriberId > 0 && result.ListId == ActiveUnsubscribedApiListId);
         }
 
         [TestMethod]
@@ -381,7 +390,7 @@ namespace WebDaoTests.TestsLib
                 }
             }
 
-            Assert.AreEqual(true, result.WasAdded);
+            Assert.AreEqual(true, result.WasAdded && result.SubscriberId > 0 && result.ListId == ActiveNotSubscribedListId);
         }
 
         [TestMethod]
@@ -420,6 +429,85 @@ namespace WebDaoTests.TestsLib
             }
 
             Assert.AreEqual(true, result.WasAlreadyOnList);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void DeleteSubscriber_NotExists_Test()
+        {
+            var subscriberManager = Container.GetInstance<SubscriberManager>();
+
+            using (var tran = Container.GetInstance<ISession>().BeginTransaction())
+            {
+                try
+                {
+                    subscriberManager
+                        .DeleteSubscriber(
+                            subscriberId: NotExistSubscriberId,
+                            messageGuid: null,
+                            listId: ActiveSubscribedListId,
+                            unitId: CurrentUnitId,
+                            reason: UnsubscribeReason.Api,
+                            browser: null,
+                            browserVersion: null,
+                            device: null,
+                            deviceVersion: null,
+                            environment: null,
+                            environmentVersion: null,
+                            renderingEngine: null,
+                            renderingEngineVersion: null,
+                            isMobile: false,
+                            clientLanguage: null,
+                            clientEmailDomain: null
+                        );
+                }
+                finally
+                {
+                    // przywracamy zmienione obiekty do poprzedniego stanu
+                    tran.Rollback();
+                }
+            }
+        }
+
+        [TestMethod]
+        public void DeleteSubscriber_Exist_Test()
+        {
+            List<RemovalModel> result;
+
+            var subscriberManager = Container.GetInstance<SubscriberManager>();
+
+            using (var tran = Container.GetInstance<ISession>().BeginTransaction())
+            {
+                try
+                {
+                    result = subscriberManager
+                        .DeleteSubscriber(
+                            subscriberId: ExistSubscriberId,
+                            messageGuid: null,
+                            listId: ActiveSubscribedListId,
+                            unitId: CurrentUnitId,
+                            reason: UnsubscribeReason.Api,
+                            browser: null,
+                            browserVersion: null,
+                            device: null,
+                            deviceVersion: null,
+                            environment: null,
+                            environmentVersion: null,
+                            renderingEngine: null,
+                            renderingEngineVersion: null,
+                            isMobile: false,
+                            clientLanguage: null,
+                            clientEmailDomain: null
+                        );
+                }
+                finally
+                {
+                    // przywracamy zmienione obiekty do poprzedniego stanu
+                    tran.Rollback();
+                }
+            }
+
+            Assert.AreEqual(1, result.Count(r => r.ListId == ActiveSubscribedListId));
         }
 
         #region GetSubscriberManager

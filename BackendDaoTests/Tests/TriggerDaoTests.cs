@@ -13,10 +13,7 @@ namespace BackendDaoTests.Tests
         private const int CurrentUnitId = 1;
 
         public TriggerDaoTests()
-            : base(new EsAppContext
-            {
-                CurrentServiceId = CurrentUnitId
-            })
+            : base(new EsAppContext { CurrentServiceId = CurrentUnitId })
         { }
 
         public override void Start()
