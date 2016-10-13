@@ -9,9 +9,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>MainBackendDaoTests</RootNamespace>
     <AssemblyName>MainBackendDaoTests</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -36,21 +37,6 @@
     <Reference Include="Dapper, Version=1.40.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Dapper.1.42\lib\net45\Dapper.dll</HintPath>
       <Private>True</Private>
-    </Reference>
-    <Reference Include="ExpertSender.Backend.DAL">
-      <HintPath>..\..\..\vso\ExpertSender 2\Main\Src\ExpertSender.Backend.DAL\bin\Debug\ExpertSender.Backend.DAL.dll</HintPath>
-    </Reference>
-    <Reference Include="ExpertSender.Backend.Host">
-      <HintPath>..\..\..\vso\ExpertSender 2\Main\Src\ExpertSender.Backend.Host\obj\Debug\ExpertSender.Backend.Host.dll</HintPath>
-    </Reference>
-    <Reference Include="ExpertSender.Common">
-      <HintPath>..\..\..\vso\ExpertSender 2\Main\Src\ExpertSender.Common\bin\Debug\ExpertSender.Common.dll</HintPath>
-    </Reference>
-    <Reference Include="ExpertSender.DataModel">
-      <HintPath>..\..\..\vso\ExpertSender 2\Main\Src\ExpertSender.DataModel\bin\Debug\ExpertSender.DataModel.dll</HintPath>
-    </Reference>
-    <Reference Include="ExpertSender.Lib">
-      <HintPath>..\..\..\vso\ExpertSender 2\Main\Src\ExpertSender.Lib\bin\Debug\ExpertSender.Lib.dll</HintPath>
     </Reference>
     <Reference Include="StructureMap, Version=4.2.0.402, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\structuremap.4.2.0.402\lib\net40\StructureMap.dll</HintPath>

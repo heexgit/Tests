@@ -1,4 +1,5 @@
 ﻿using System;
+using CommonRuns.Tests;
 using ExpertSender.Common.Helpers;
 
 namespace CommonRuns
@@ -9,9 +10,12 @@ namespace CommonRuns
 
         private static void Main()
         {
-            _modelsRegister = new ModelsRegister();
+            //_modelsRegister = new ModelsRegister();
+            //var link = GetClickLink();
+            new LockTests().Start();
 
-            var link = GetClickLink();
+            Console.WriteLine("Press any key");
+            Console.ReadKey();
         }
 
         private static string GetClickLink()
