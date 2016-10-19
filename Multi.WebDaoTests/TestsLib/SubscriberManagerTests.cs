@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ExpertSender.Common.Helpers;
+using ExpertSender.Common.QueryBuilder;
+using ExpertSender.DataModel.Dao;
+using ExpertSender.DataModel.Dao.Statistics;
 using ExpertSender.DataModel.Enums;
 using ExpertSender.Lib.SubscriberManager;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -13,21 +17,25 @@ using Resources = ExpertSender.Lib.SubscriberManager.Resources;
 
 namespace Multi.WebDaoTests.TestsLib
 {
-    /*
-
-        KOD może się nie buildować ze wzgledu na wycoafanie zmian z DEV
-        rozważyć przełączenie do MULTI
-
-    */
     [TestClass]
-    public class SubscriberManagerTests : Tester
+    public class SubscriberManagerTests : Tester, IDisposable
     {
+        private readonly ITransaction _transaction;
         private const int CurrentUnitId = 1;
 
         private const int ExistSubscriberId = 4238630;
+        private const string ExistEmail = "grzegorz.tylak@expertsender.com";
+        private const string ExistMd5 = "DC6A810C497071BEAD1DFC2449282A63";
+        private const string ExistPhone = "48900800700";
+        private const string ExistCustomSubscriberId = "grzegorz.tylak";
+
         private const int NotExistSubscriberId = -1;
-        private const string ExistSubscriber = "grzegorz.tylak@expertsender.com";
-        private const string NotExistSubscriber = "xyz19872842@expertsender.com";
+        private const string NotExistEmail = "xyz19872842@expertsender.com";
+        private const string NotExistMd5 = "00000000000000000000000449282A63";
+        private const string NotExistPhone = "1441872842";
+        private const string NotExistCustomSubscriberId = "xxppeoo3994hdfhs";
+
+        private const string SubscriberIp = "123.9.88.99";
 
         /// <summary>
         /// subskrybent jest zapisany do listy
@@ -59,97 +67,328 @@ namespace Multi.WebDaoTests.TestsLib
         private const int DeletedProperty = 2166;
 
         public SubscriberManagerTests()
-            : base(new EsAppContext { CurrentServiceId = CurrentUnitId })
-        { }
+            : base(new EsAppContext {CurrentServiceId = CurrentUnitId})
+        {
+            _transaction = Container.GetInstance<ISession>().BeginTransaction();
+        }
+
+        public void Dispose()
+        {
+            _transaction.Rollback();
+        }
 
         public override void Start()
         {
-            AddSubscriber_ListDoesNotBelongToService_Test();
+            AddSubscriber_Email_E_ListDoesNotBelongToService_Test();
+        }
+
+        #region ListDoesNotBelongToService
+
+        [TestMethod]
+        [ExpectedException(typeof(SubscriberManagerException))]
+        public void AddSubscriber_Email_E_ListDoesNotBelongToService_Test()
+        {
+            ListDoesNotBelongToService(MatchBy.Email, email: ExistEmail);
         }
 
         [TestMethod]
         [ExpectedException(typeof(SubscriberManagerException))]
-        public void AddSubscriber_ListDoesNotBelongToService_Test()
+        public void AddSubscriber_Phone_P_ListDoesNotBelongToService_Test()
         {
+            ListDoesNotBelongToService(MatchBy.Phone, phone: ExistPhone);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(SubscriberManagerException))]
+        public void AddSubscriber_Email_EP_ListDoesNotBelongToService_Test()
+        {
+            ListDoesNotBelongToService(MatchBy.Email, email: ExistEmail, phone: ExistPhone);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(SubscriberManagerException))]
+        public void AddSubscriber_Phone_EP_ListDoesNotBelongToService_Test()
+        {
+            ListDoesNotBelongToService(MatchBy.Phone, email: ExistEmail, phone: ExistPhone);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(SubscriberManagerException))]
+        public void AddSubscriber_Email_EP5_ListDoesNotBelongToService_Test()
+        {
+            ListDoesNotBelongToService(MatchBy.Email, email: ExistEmail, phone: ExistPhone, emailMd5: ExistMd5);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(SubscriberManagerException))]
+        public void AddSubscriber_Phone_EP5_ListDoesNotBelongToService_Test()
+        {
+            ListDoesNotBelongToService(MatchBy.Phone, email: ExistEmail, phone: ExistPhone, emailMd5: ExistMd5);
+        }
+
+        private AddSubscriberResult ListDoesNotBelongToService(MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null)
+        {
+            AddSubscriberResult result = null;
+
             try
             {
-                var result = SM_AddAndIgnore()
+                result = SM_AddAndIgnore(matchBy)
                     .AddSubscriber(
                         DeletedListId,
-                        id: null, //SubscriberId
-                        email: ExistSubscriber,
-                        emailMd5: null,
-                        phone: null,
-                        customSubscriberId: null,
+                        id: subscriberId,
+                        email: email,
+                        emailMd5: emailMd5,
+                        phone: phone,
+                        customSubscriberId: customSubscriberId,
                         firstName: "Jan",
                         lastName: "Kowalski",
                         trackingCode: null,
                         vendor: null,
-                        ip: "123.9.88.99",
+                        ip: SubscriberIp,
                         propertiesDictionary: new Dictionary<int, object> {{DeletedProperty, "jakiś blok"}}
                     );
             }
             catch (SubscriberManagerException ex)
             {
+                Assert.AreEqual(2, ex.FieldsErrors.Count);
+
                 if (
                     ex.FieldsErrors.SingleOrDefault(e => e.Key == "listId").Value.Contains(Resources.SubscriberManager.ListDoesNotBelongToService)
                     && ex.FieldsErrors.SingleOrDefault(e => e.Key == "serviceId").Value.Contains(Resources.SubscriberManager.ListDoesNotBelongToService)
                 )
                     throw ex;
             }
+
+            return result;
+        }
+        #endregion
+
+        #region FieldIsRequired
+
+        [TestMethod]
+        [ExpectedException(typeof(SubscriberManagerException))]
+        public void AddSubscriber_Email_E_FieldIsRequired_Test()
+        {
+            FieldIsRequired(MatchBy.Email, email: NotExistEmail);
         }
 
         [TestMethod]
         [ExpectedException(typeof(SubscriberManagerException))]
-        public void AddSubscriber_FieldIsRequired_Test()
+        public void AddSubscriber_Phone_P_FieldIsRequired_Test()
         {
+            FieldIsRequired(MatchBy.Phone, phone: NotExistPhone);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(SubscriberManagerException))]
+        public void AddSubscriber_Email_EP_FieldIsRequired_Test()
+        {
+            FieldIsRequired(MatchBy.Email, email: NotExistEmail, phone: NotExistPhone);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(SubscriberManagerException))]
+        public void AddSubscriber_Phone_EP_FieldIsRequired_Test()
+        {
+            FieldIsRequired(
+                MatchBy.Phone,
+                email: NotExistEmail,
+                phone: NotExistPhone
+            );
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(NotFoundException))]
+        public void AddSubscriber_Email_P5_FieldIsRequired_Test()
+        {
+            FieldIsRequired(
+                MatchBy.Email,
+                phone: NotExistPhone,
+                emailMd5: NotExistMd5,
+                ifErrorConditition: ex => ex.FieldsErrors.SingleOrDefault(e => e.Key == "email").Value.Contains(Resources.SubscriberManager.EmailIsInvalid)
+            );
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(SubscriberManagerException))]
+        public void AddSubscriber_Phone_E5_FieldIsRequired_Test()
+        {
+            FieldIsRequired(
+                MatchBy.Phone,
+                email: NotExistEmail,
+                emailMd5: NotExistMd5,
+                ifErrorConditition: ex => ex.FieldsErrors.SingleOrDefault(e => e.Key == "phone").Value.Contains(Resources.SubscriberManager.PhoneIsInvalid)
+            );
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(SubscriberManagerException))]
+        public void AddSubscriber_Custom_EP_FieldIsRequired_Test()
+        {
+            var result = FieldIsRequired(
+                MatchBy.CustomSubscriberId,
+                email: NotExistEmail,
+                phone: NotExistPhone,
+                ifErrorConditition: ex => ex.FieldsErrors.SingleOrDefault(e => e.Key == "customSubscriberId").Value.Contains(Resources.SubscriberManager.CustomSubscriberIdIsInvalid)
+            );
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(SubscriberManagerException))]
+        public void AddSubscriber_Custom_NoData_FieldIsRequired_Test()
+        {
+            var result = FieldIsRequired(
+                MatchBy.CustomSubscriberId,
+                ifErrorConditition: ex =>
+                    ex.FieldsErrors.SingleOrDefault(e => e.Key == "customSubscriberId").Value.Contains(Resources.SubscriberManager.CustomSubscriberIdIsInvalid)
+                    && ex.FieldsErrors.SingleOrDefault(e => e.Key == "email").Value.Contains(Resources.SubscriberManager.EmailOrPhoneRequired)
+                    && ex.FieldsErrors.SingleOrDefault(e => e.Key == "phone").Value.Contains(Resources.SubscriberManager.EmailOrPhoneRequired)
+            );
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(SubscriberManagerException))]
+        public void AddSubscriber_Custom_NoContacts_FieldIsRequired_Test()
+        {
+            var result = FieldIsRequired(
+                MatchBy.CustomSubscriberId,
+                customSubscriberId: ExistCustomSubscriberId,
+                ifErrorConditition: ex =>
+                    ex.FieldsErrors.SingleOrDefault(e => e.Key == "email").Value.Contains(Resources.SubscriberManager.EmailOrPhoneRequired)
+                    && ex.FieldsErrors.SingleOrDefault(e => e.Key == "phone").Value.Contains(Resources.SubscriberManager.EmailOrPhoneRequired)
+            );
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(SubscriberManagerException))]
+        public void AddSubscriber_Id_E_FieldIsRequired_Test()
+        {
+            var result = FieldIsRequired(
+                MatchBy.Id,
+                email: NotExistEmail,
+                ifErrorConditition: ex => ex.FieldsErrors.SingleOrDefault(e => e.Key == "subscriberId").Value.Contains(Resources.SubscriberManager.IdIsInvalid)
+            );
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(SubscriberManagerException))]
+        public void AddSubscriber_Id_EP_FieldIsRequired_Test()
+        {
+            var result = FieldIsRequired(
+                MatchBy.Id,
+                email: NotExistEmail,
+                phone: NotExistPhone,
+                ifErrorConditition: ex => ex.FieldsErrors.SingleOrDefault(e => e.Key == "subscriberId").Value.Contains(Resources.SubscriberManager.IdIsInvalid)
+            );
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(SubscriberManagerException))]
+        public void AddSubscriber_Id_NoData_FieldIsRequired_Test()
+        {
+            var result = FieldIsRequired(
+                MatchBy.Id,
+                ifErrorConditition: ex =>
+                    ex.FieldsErrors.SingleOrDefault(e => e.Key == "subscriberId").Value.Contains(Resources.SubscriberManager.IdIsInvalid)
+                    && ex.FieldsErrors.SingleOrDefault(e => e.Key == "email").Value.Contains(Resources.SubscriberManager.EmailOrPhoneRequired)
+                    && ex.FieldsErrors.SingleOrDefault(e => e.Key == "phone").Value.Contains(Resources.SubscriberManager.EmailOrPhoneRequired)
+            );
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(SubscriberManagerException))]
+        public void AddSubscriber_Id_NoContacts_FieldIsRequired_Test()
+        {
+            var result = FieldIsRequired(
+                MatchBy.Id,
+                subscriberId: ExistSubscriberId,
+                ifErrorConditition: ex =>
+                    ex.FieldsErrors.SingleOrDefault(e => e.Key == "email").Value.Contains(Resources.SubscriberManager.EmailOrPhoneRequired)
+                    && ex.FieldsErrors.SingleOrDefault(e => e.Key == "phone").Value.Contains(Resources.SubscriberManager.EmailOrPhoneRequired)
+            );
+        }
+
+        private AddSubscriberResult FieldIsRequired(MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
+        {
+            AddSubscriberResult result = null;
+
             try
             {
-                var result = SM_AddAndIgnore()
+                result = SM_AddAndIgnore(matchBy)
                     .AddSubscriber(
                         ActiveSubscribedListId,
-                        id: null, //SubscriberId
-                        email: ExistSubscriber,
-                        emailMd5: null,
-                        phone: null,
-                        customSubscriberId: null,
+                        id: subscriberId,
+                        email: email,
+                        emailMd5: emailMd5,
+                        phone: phone,
+                        customSubscriberId: customSubscriberId,
                         firstName: "Jan",
                         lastName: "Kowalski",
                         trackingCode: null,
                         vendor: null,
-                        ip: "123.9.88.99",
+                        ip: SubscriberIp,
                         propertiesDictionary: new Dictionary<int, object> {{DeletedProperty, "jakiś blok"}}
                     );
             }
             catch (SubscriberManagerException ex)
             {
-                if (
-                    ex.PropertiesErrors.SingleOrDefault(e => e.Key == RequiredPropertyString).Value.Contains(string.Format(Resources.SubscriberManager.FieldIsRequired, "wymagana cecha"))
-                    && ex.PropertiesErrors.SingleOrDefault(e => e.Key == RequiredPropertyInt).Value.Contains(string.Format(Resources.SubscriberManager.FieldIsRequired, "cecha liczbowa xx3"))
-                )
+                if (ifErrorConditition == null)
+                {
+                    ifErrorConditition = exx =>
+                        exx.PropertiesErrors.SingleOrDefault(e => e.Key == RequiredPropertyString).Value.Contains(string.Format(Resources.SubscriberManager.FieldIsRequired, "wymagana cecha"))
+                        && exx.PropertiesErrors.SingleOrDefault(e => e.Key == RequiredPropertyInt).Value.Contains(string.Format(Resources.SubscriberManager.FieldIsRequired, "cecha liczbowa xx3"));
+                }
+
+                if (ifErrorConditition(ex))
                     throw ex;
             }
+
+            return result;
+        }
+        #endregion
+
+        #region InvalidPropValue
+        
+        [TestMethod]
+        [ExpectedException(typeof(SubscriberManagerException))]
+        public void AddSubscriber_Email_E_InvalidPropValue_Test()
+        {
+            InvalidPropValue(MatchBy.Email, email: ExistEmail);
         }
 
         [TestMethod]
         [ExpectedException(typeof(SubscriberManagerException))]
-        public void AddSubscriber_InvalidValue_Test()
+        public void AddSubscriber_Phone_P_InvalidPropValue_Test()
         {
+            InvalidPropValue(MatchBy.Phone, phone: ExistPhone);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(SubscriberManagerException))]
+        public void AddSubscriber_Email_5_InvalidPropValue_Test()
+        {
+            InvalidPropValue(MatchBy.Email, emailMd5: ExistMd5);
+        }
+
+        public AddSubscriberResult InvalidPropValue(MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
+        {
+            AddSubscriberResult result = null;
+
             try
             {
-                var result = SM_AddAndIgnore()
+                result = SM_AddAndIgnore(matchBy)
                     .AddSubscriber(
                         ActiveSubscribedListId,
-                        id: null, //SubscriberId
-                        email: ExistSubscriber,
-                        emailMd5: null,
-                        phone: null,
-                        customSubscriberId: null,
+                        id: subscriberId,
+                        email: email,
+                        emailMd5: emailMd5,
+                        phone: phone,
+                        customSubscriberId: customSubscriberId,
                         firstName: "Jan",
                         lastName: "Kowalski",
                         trackingCode: null,
                         vendor: null,
-                        ip: "123.9.88.99",
+                        ip: SubscriberIp,
                         propertiesDictionary: new Dictionary<int, object>
                         {
                             {RequiredPropertyString, "jakiś blok"},
@@ -160,126 +399,53 @@ namespace Multi.WebDaoTests.TestsLib
             }
             catch (SubscriberManagerException ex)
             {
-                if (
-                    ex.PropertiesErrors.SingleOrDefault(e => e.Key == RequiredPropertyInt).Value.Contains(string.Format(Resources.SubscriberManager.InvalidValue, "cecha liczbowa xx3"))
-                )
+                if (ifErrorConditition == null)
+                {
+                    ifErrorConditition = exx =>
+                        exx.PropertiesErrors.SingleOrDefault(e => e.Key == RequiredPropertyInt).Value.Contains(string.Format(Resources.SubscriberManager.InvalidValue, "cecha liczbowa xx3"));
+                }
+
+                if (ifErrorConditition(ex))
                     throw ex;
             }
+
+            return result;
+        }
+        #endregion
+
+        #region WasIgnored
+
+        [TestMethod]
+        public void AddSubscriber_Email_WasIgnored_Test()
+        {
+            WasIgnored(MatchBy.Email, email: ExistEmail);
         }
 
         [TestMethod]
-        public void AddSubscriber_WasIgnored_Test()
+        public void AddSubscriber_Phone_WasIgnored_Test()
         {
-            var result = SM_AddAndIgnore()
-                .AddSubscriber(
-                    ActiveSubscribedListId,
-                    id: null, //SubscriberId
-                    email: ExistSubscriber,
-                    emailMd5: null,
-                    phone: null,
-                    customSubscriberId: null,
-                    firstName: "Jan",
-                    lastName: "Kowalski",
-                    trackingCode: null,
-                    vendor: null,
-                    ip: "123.9.88.99",
-                    propertiesDictionary: new Dictionary<int, object>
-                    {
-                        {RequiredPropertyString, "jakiś blok"},
-                        {RequiredPropertyInt, 7897987},
-                        {DeletedProperty, "jakiś blok"}
-                    }
-                );
-
-            Assert.AreEqual(true, result.WasIgnored);
+            WasIgnored(MatchBy.Phone, phone: ExistPhone);
         }
 
-        [TestMethod]
-        public void AddSubscriber_WasAlreadyOnList_Test()
+        public AddSubscriberResult WasIgnored(MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
         {
-            var result = SM_AddAndUpdate()
-                .AddSubscriber(
-                    ActiveSubscribedListId,
-                    id: null, //SubscriberId
-                    email: ExistSubscriber,
-                    emailMd5: null,
-                    phone: null,
-                    customSubscriberId: null,
-                    firstName: "Jan",
-                    lastName: "Kowalski",
-                    trackingCode: null,
-                    vendor: null,
-                    ip: "123.9.88.99",
-                    propertiesDictionary: new Dictionary<int, object>
-                    {
-                        {RequiredPropertyString, "jakiś blok"},
-                        {RequiredPropertyInt, 7897987},
-                        {DeletedProperty, "jakiś blok"}
-                    }
-                );
+            AddSubscriberResult result = null;
 
-            Assert.AreEqual(true, result.WasAlreadyOnList);
-        }
-
-        [TestMethod]
-        public void AddSubscriber_WasAddedToList_Test()
-        {
-            AddSubscriberResult result;
-
-            using (var tran = Container.GetInstance<ISession>().BeginTransaction())
-            {
-                try
-                {
-                    result = SM_AddAndUpdate()
-                        .AddSubscriber(
-                            ActiveNotSubscribedListId,
-                            id: null, //SubscriberId
-                            email: ExistSubscriber,
-                            emailMd5: null,
-                            phone: null,
-                            customSubscriberId: null,
-                            firstName: "Jan",
-                            lastName: "Kowalski",
-                            trackingCode: null,
-                            vendor: null,
-                            ip: "123.9.88.99",
-                            propertiesDictionary: new Dictionary<int, object>
-                            {
-                                {RequiredPropertyString, "jakiś blok"},
-                                {RequiredPropertyInt, 7897987},
-                                {DeletedProperty, "jakiś blok"}
-                            }
-                        );
-                }
-                finally
-                {
-                    // przywracamy zmienione obiekty do poprzedniego stanu
-                    tran.Rollback();
-                }
-            }
-
-            Assert.AreEqual(true, result.WasAddedToList);
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(SubscriberManagerException))]
-        public void AddSubscriber_EmailRejected_Test()
-        {
             try
             {
-                var result = SM_AddAndUpdate()
+                result = SM_AddAndIgnore(matchBy)
                     .AddSubscriber(
-                        ActiveComplaintListId,
-                        id: null, //SubscriberId
-                        email: ExistSubscriber,
-                        emailMd5: null,
-                        phone: null,
-                        customSubscriberId: null,
+                        ActiveSubscribedListId,
+                        id: subscriberId,
+                        email: email,
+                        emailMd5: emailMd5,
+                        phone: phone,
+                        customSubscriberId: customSubscriberId,
                         firstName: "Jan",
                         lastName: "Kowalski",
                         trackingCode: null,
                         vendor: null,
-                        ip: "123.9.88.99",
+                        ip: SubscriberIp,
                         propertiesDictionary: new Dictionary<int, object>
                         {
                             {RequiredPropertyString, "jakiś blok"},
@@ -290,32 +456,59 @@ namespace Multi.WebDaoTests.TestsLib
             }
             catch (SubscriberManagerException ex)
             {
-                if (
-                    ex.FieldsErrors.SingleOrDefault(e => e.Key == "email").Value.Contains(Resources.SubscriberManager.EmailRejected)
-                )
+                if (ifErrorConditition == null)
+                {
+                    ifErrorConditition = exx =>
+                        exx.PropertiesErrors.SingleOrDefault(e => e.Key == RequiredPropertyInt).Value.Contains(string.Format(Resources.SubscriberManager.InvalidValue, "cecha liczbowa xx3"));
+                }
+
+                if (ifErrorConditition(ex))
                     throw ex;
             }
+
+            Assert.IsNotNull(result);
+            if (result != null)
+            {
+                Assert.AreEqual(true, result.WasIgnored);
+            }
+
+            return result;
+        }
+        #endregion
+
+        #region WasAlreadyOnList
+
+        [TestMethod]
+        public void AddSubscriber_Email_WasAlreadyOnList_Test()
+        {
+            var result = WasAlreadyOnList(MatchBy.Email, email: ExistEmail);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(SubscriberManagerException))]
-        public void AddSubscriber_EmailRejected_Option_Test()
+        public void AddSubscriber_Phone_WasAlreadyOnList_Test()
         {
+            var result = WasAlreadyOnList(MatchBy.Phone, phone: ExistPhone);
+        }
+
+        private AddSubscriberResult WasAlreadyOnList(MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
+        {
+            AddSubscriberResult result = null;
+
             try
             {
-                var result = SM_AddAndUpdate()
+                result = SM_AddAndUpdate(matchBy)
                     .AddSubscriber(
-                        ActiveComplaintListId,
-                        id: null, //SubscriberId
-                        email: ExistSubscriber,
-                        emailMd5: null,
-                        phone: null,
-                        customSubscriberId: null,
+                        listId: ActiveSubscribedListId,
+                        email: email,
+                        id: subscriberId,
+                        emailMd5: emailMd5,
+                        phone: phone,
+                        customSubscriberId: customSubscriberId,
                         firstName: "Jan",
                         lastName: "Kowalski",
                         trackingCode: null,
                         vendor: null,
-                        ip: "123.9.88.99",
+                        ip: SubscriberIp,
                         propertiesDictionary: new Dictionary<int, object>
                         {
                             {RequiredPropertyString, "jakiś blok"},
@@ -326,217 +519,778 @@ namespace Multi.WebDaoTests.TestsLib
             }
             catch (SubscriberManagerException ex)
             {
-                if (
-                    ex.FieldsErrors.SingleOrDefault(e => e.Key == "email").Value.Contains(Resources.SubscriberManager.EmailRejected)
-                )
+                //if (ifErrorConditition == null)
+                //{
+                //    ifErrorConditition = exx =>
+                //        exx.PropertiesErrors.SingleOrDefault(e => e.Key == RequiredPropertyInt).Value.Contains(string.Format(Resources.SubscriberManager.InvalidValue, "cecha liczbowa xx3"));
+                //}
+
+                //if (ifErrorConditition(ex))
+                //    throw ex;
+            }
+
+            Assert.IsNotNull(result);
+            if (result != null)
+            {
+                Assert.AreEqual(true, result.WasAlreadyOnList);
+            }
+
+            return result;
+        }
+        #endregion
+
+        #region WasAddedToList
+
+        [TestMethod]
+        public void AddSubscriber_Email_E_WasAddedToList_Test()
+        {
+            var result = WasAddedToList(MatchBy.Email, email: ExistEmail);
+
+            var fact = result.Item2;
+            if (fact != null)
+            {
+                Assert.AreEqual(3, fact.DomainId);
+                Assert.AreEqual(SubscriberIp, fact.ClientIp);
+                Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
+
+                Assert.AreEqual(ChannelType.Email, fact.ChannelTypeId);
+            }
+        }
+
+        [TestMethod]
+        public void AddSubscriber_Email_5_WasAddedToList_Test()
+        {
+            var result = WasAddedToList(MatchBy.Email, emailMd5: ExistMd5);
+
+            var fact = result.Item2;
+            if (fact != null)
+            {
+                Assert.AreEqual(3, fact.DomainId);
+                Assert.AreEqual(SubscriberIp, fact.ClientIp);
+                Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
+
+                Assert.AreEqual(ChannelType.Email, fact.ChannelTypeId);
+            }
+        }
+
+        [TestMethod]
+        public void AddSubscriber_Phone_P_WasAddedToList_Test()
+        {
+            var result = WasAddedToList(MatchBy.Phone, phone: ExistPhone);
+
+            var fact = result.Item2;
+            if (fact != null)
+            {
+                Assert.AreEqual(null, fact.DomainId);
+                Assert.AreEqual(SubscriberIp, fact.ClientIp);
+                Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
+
+                Assert.AreEqual(ChannelType.SmsMms, fact.ChannelTypeId);
+            }
+        }
+
+        private Tuple<AddSubscriberResult, FactSubscription> WasAddedToList(MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
+        {
+            AddSubscriberResult result = null;
+            FactSubscription fact = null;
+
+            try
+            {
+                result = SM_AddAndUpdate(matchBy)
+                    .AddSubscriber(
+                        ActiveNotSubscribedListId,
+                        id: subscriberId,
+                        email: email,
+                        emailMd5: emailMd5,
+                        phone: phone,
+                        customSubscriberId: customSubscriberId,
+                        firstName: "Jan",
+                        lastName: "Kowalski",
+                        trackingCode: null,
+                        vendor: null,
+                        ip: SubscriberIp,
+                        propertiesDictionary: new Dictionary<int, object>
+                        {
+                            {RequiredPropertyString, "jakiś blok"},
+                            {RequiredPropertyInt, 7897987},
+                            {DeletedProperty, "jakiś blok"}
+                        }
+                    );
+
+                fact = LoadSubscriptions(result.SubscriberId, result.ListId).FirstOrDefault();
+            }
+            catch (SubscriberManagerException ex)
+            { }
+
+            Assert.IsNotNull(result);
+            if (result != null)
+            {
+                Assert.AreEqual(true, result.WasAddedToList);
+            }
+
+            Assert.IsNotNull(fact);
+
+            return new Tuple<AddSubscriberResult, FactSubscription>(result, fact);
+        }
+        #endregion
+
+        #region EmailRejected
+
+        [TestMethod]
+        [ExpectedException(typeof(SubscriberManagerException))]
+        public void AddSubscriber_Email_EmailRejected_Test()
+        {
+            var result = EmailRejected(MatchBy.Email, email: ExistEmail);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(SubscriberManagerException))]
+        public void AddSubscriber_Phone_EmailRejected_Test()
+        {
+            var result = EmailRejected(MatchBy.Phone, phone: ExistPhone);
+        }
+
+        public AddSubscriberResult EmailRejected(MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
+        {
+            AddSubscriberResult result = null;
+
+            try
+            {
+                result = SM_AddAndUpdate(matchBy)
+                    .AddSubscriber(
+                        ActiveComplaintListId,
+                        id: subscriberId,
+                        email: email,
+                        emailMd5: emailMd5,
+                        phone: phone,
+                        customSubscriberId: customSubscriberId,
+                        firstName: "Jan",
+                        lastName: "Kowalski",
+                        trackingCode: null,
+                        vendor: null,
+                        ip: SubscriberIp,
+                        propertiesDictionary: new Dictionary<int, object>
+                        {
+                            {RequiredPropertyString, "jakiś blok"},
+                            {RequiredPropertyInt, 7897987},
+                            {DeletedProperty, "jakiś blok"}
+                        }
+                    );
+            }
+            catch (SubscriberManagerException ex)
+            {
+                if (ifErrorConditition == null)
+                {
+                    if (matchBy == MatchBy.Email)
+                        ifErrorConditition = exx =>
+                            exx.FieldsErrors.SingleOrDefault(e => e.Key == "email").Value.Contains(Resources.SubscriberManager.EmailRejected);
+                    else
+                        ifErrorConditition = exx =>
+                            exx.FieldsErrors.SingleOrDefault(e => e.Key == "phone").Value.Contains(Resources.SubscriberManager.PhoneRejected);
+                }
+
+                if (ifErrorConditition(ex))
                     throw ex;
             }
+
+            return result;
+        }
+        #endregion
+
+        #region AddUnsubscribed
+
+        [TestMethod]
+        [ExpectedException(typeof(SubscriberManagerException))]
+        public void AddSubscriber_Email_AddUnsubscribed_EmailRejected_Test()
+        {
+            var result = AddUnsubscribed(MatchBy.Email, email: ExistEmail);
         }
 
         [TestMethod]
-        public void AddSubscriber_WasReAddedToList_Test()
+        [ExpectedException(typeof(SubscriberManagerException))]
+        public void AddSubscriber_Phone_AddUnsubscribed_EmailRejected_Test()
         {
-            AddSubscriberResult result;
+            var result = AddUnsubscribed(MatchBy.Phone, phone: ExistPhone);
+        }
 
-            using (var tran = Container.GetInstance<ISession>().BeginTransaction())
+        private AddSubscriberResult AddUnsubscribed(MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
+        {
+            AddSubscriberResult result = null;
+            try
             {
-                try
+                result = SM_AddAndUpdate_AddUnsubscribed(matchBy)
+                    .AddSubscriber(
+                        ActiveComplaintListId,
+                        id: subscriberId,
+                        email: email,
+                        emailMd5: emailMd5,
+                        phone: phone,
+                        customSubscriberId: customSubscriberId,
+                        firstName: "Jan",
+                        lastName: "Kowalski",
+                        trackingCode: null,
+                        vendor: null,
+                        ip: SubscriberIp,
+                        propertiesDictionary: new Dictionary<int, object>
+                        {
+                            {RequiredPropertyString, "jakiś blok"},
+                            {RequiredPropertyInt, 7897987},
+                            {DeletedProperty, "jakiś blok"}
+                        }
+                    );
+            }
+            catch (SubscriberManagerException ex)
+            {
+                if (ifErrorConditition == null)
                 {
-                    result = SM_AddAndUpdate_AllowUnsubscribedByUser()
-                        .AddSubscriber(
-                            ActiveUnsubscribedApiListId,
-                            id: null, //SubscriberId
-                            email: ExistSubscriber,
-                            emailMd5: null,
-                            phone: null,
-                            customSubscriberId: null,
-                            firstName: "Jan",
-                            lastName: "Kowalski",
-                            trackingCode: null,
-                            vendor: null,
-                            ip: "123.9.88.99",
-                            propertiesDictionary: new Dictionary<int, object>
-                            {
-                                {RequiredPropertyString, "jakiś blok"},
-                                {RequiredPropertyInt, 7897987},
-                                {DeletedProperty, "jakiś blok"}
-                            }
-                        );
+                    if (matchBy == MatchBy.Email)
+                        ifErrorConditition = exx =>
+                            exx.FieldsErrors.SingleOrDefault(e => e.Key == "email").Value.Contains(Resources.SubscriberManager.EmailRejected);
+                    else
+                        ifErrorConditition = exx =>
+                            exx.FieldsErrors.SingleOrDefault(e => e.Key == "phone").Value.Contains(Resources.SubscriberManager.PhoneRejected);
                 }
-                finally
-                {
-                    // przywracamy zmienione obiekty do poprzedniego stanu
-                    tran.Rollback();
-                }
+
+                if (ifErrorConditition(ex))
+                    throw ex;
             }
 
-            Assert.AreEqual(true, result.WasReAddedToList && result.SubscriberId > 0 && result.ListId == ActiveUnsubscribedApiListId);
+            return result;
+        }
+        #endregion
+
+        #region WasReAddedToList
+
+        [TestMethod]
+        public void AddSubscriber_Email_WasReAddedToList_Test()
+        {
+            var result = WasReAddedToList(MatchBy.Email, email: ExistEmail);
+
+            var fact = result.Item2;
+            if (fact != null)
+            {
+                Assert.AreEqual(3, fact.DomainId);
+                Assert.AreEqual(SubscriberIp, fact.ClientIp);
+                Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
+
+                Assert.AreEqual(ChannelType.Email, fact.ChannelTypeId);
+            }
         }
 
         [TestMethod]
-        public void AddSubscriber_WasAdded_Test()
+        public void AddSubscriber_Phone_WasReAddedToList_Test()
         {
-            AddSubscriberResult result;
+            var result = WasReAddedToList(MatchBy.Phone, phone: ExistPhone);
 
-            using (var tran = Container.GetInstance<ISession>().BeginTransaction())
+            var fact = result.Item2;
+            if (fact != null)
             {
-                try
-                {
-                    result = SM_AddAndUpdate()
-                        .AddSubscriber(
-                            ActiveNotSubscribedListId,
-                            id: null, //SubscriberId
-                            email: NotExistSubscriber,
-                            emailMd5: null,
-                            phone: null,
-                            customSubscriberId: null,
-                            firstName: "Jan",
-                            lastName: "Kowalski",
-                            trackingCode: null,
-                            vendor: null,
-                            ip: "123.9.88.99",
-                            propertiesDictionary: new Dictionary<int, object>
-                            {
-                                {RequiredPropertyString, "jakiś blok"},
-                                {RequiredPropertyInt, 7897987},
-                                {DeletedProperty, "jakiś blok"}
-                            }
-                        );
-                }
-                finally
-                {
-                    // przywracamy zmienione obiekty do poprzedniego stanu
-                    tran.Rollback();
-                }
+                Assert.AreEqual(null, fact.DomainId);
+                Assert.AreEqual(SubscriberIp, fact.ClientIp);
+                Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
+
+                Assert.AreEqual(ChannelType.SmsMms, fact.ChannelTypeId);
+            }
+        }
+
+        private Tuple<AddSubscriberResult, FactSubscription> WasReAddedToList(MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
+        {
+            AddSubscriberResult result = null;
+            FactSubscription fact = null;
+
+            try
+            {
+                result = SM_AddAndUpdate_AllowUnsubscribedByUser(matchBy)
+                    .AddSubscriber(
+                        ActiveUnsubscribedApiListId,
+                        id: subscriberId,
+                        email: email,
+                        emailMd5: emailMd5,
+                        phone: phone,
+                        customSubscriberId: customSubscriberId,
+                        firstName: "Jan",
+                        lastName: "Kowalski",
+                        trackingCode: null,
+                        vendor: null,
+                        ip: SubscriberIp,
+                        propertiesDictionary: new Dictionary<int, object>
+                        {
+                            {RequiredPropertyString, "jakiś blok"},
+                            {RequiredPropertyInt, 7897987},
+                            {DeletedProperty, "jakiś blok"}
+                        }
+                    );
+
+                fact = LoadSubscriptions(result.SubscriberId, result.ListId).FirstOrDefault();
+            }
+            catch (SubscriberManagerException ex)
+            {
+                //if (ifErrorConditition == null)
+                //{
+                //    ifErrorConditition = exx =>
+                //        exx.FieldsErrors.SingleOrDefault(e => e.Key == "email").Value.Contains(Resources.SubscriberManager.EmailRejected);
+                //}
+
+                //if (ifErrorConditition(ex))
+                    throw ex;
+            }
+            
+            Assert.IsNotNull(result);
+            if (result != null)
+            {
+                Assert.AreEqual(true, result.WasReAddedToList && result.SubscriberId > 0 && result.ListId == ActiveUnsubscribedApiListId);
             }
 
-            Assert.AreEqual(true, result.WasAdded && result.SubscriberId > 0 && result.ListId == ActiveNotSubscribedListId);
+            Assert.IsNotNull(fact);
+
+            return new Tuple<AddSubscriberResult, FactSubscription>(result, fact);
+        }
+        #endregion
+
+        #region WasAdded
+
+        [TestMethod]
+        public void AddSubscriber_Email_E_WasAdded_Test()
+        {
+            var result = WasAdded(MatchBy.Email, email: NotExistEmail);
+
+            var fact = result.Item2.SingleOrDefault();
+            if (fact != null)
+            {
+                Assert.AreEqual(3, fact.DomainId);
+                Assert.AreEqual(SubscriberIp, fact.ClientIp);
+                Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
+
+                Assert.AreEqual(ChannelType.Email, fact.ChannelTypeId);
+            }
         }
 
         [TestMethod]
-        public void AddSubscriber_ReplaceSubscriber_Test()
+        public void AddSubscriber_Phone_P_WasAdded_Test()
         {
-            AddSubscriberResult result;
+            var result = WasAdded(MatchBy.Phone, phone: NotExistPhone);
 
-            using (var tran = Container.GetInstance<ISession>().BeginTransaction())
+            var fact = result.Item2.SingleOrDefault();
+            if (fact != null)
             {
-                try
-                {
-                    result = SM_AddAndReplace()
-                        .AddSubscriber(
-                            ActiveSubscribedListId,
-                            id: null, //SubscriberId
-                            email: ExistSubscriber,
-                            emailMd5: null,
-                            phone: null,
-                            customSubscriberId: null,
-                            firstName: "Jan",
-                            lastName: "Kowalski",
-                            trackingCode: null,
-                            vendor: null,
-                            ip: "123.9.88.99",
-                            propertiesDictionary: new Dictionary<int, object>
-                            {
-                                {RequiredPropertyString, "jakiś blok"},
-                                {RequiredPropertyInt, 7897987},
-                                {DeletedProperty, "jakiś blok"}
-                            }
-                        );
-                }
-                finally
-                {
-                    // przywracamy zmienione obiekty do poprzedniego stanu
-                    tran.Rollback();
-                }
+                Assert.AreEqual(null, fact.DomainId);
+                Assert.AreEqual(SubscriberIp, fact.ClientIp);
+                Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
+
+                Assert.AreEqual(ChannelType.SmsMms, fact.ChannelTypeId);
+            }
+        }
+
+        [TestMethod]
+        public void AddSubscriber_Email_EP_WasAdded_Test()
+        {
+            var result = WasAdded(MatchBy.Email, email: NotExistEmail, phone: NotExistPhone);
+
+            var facts = result.Item2;
+            Assert.AreEqual(2, facts.Length);
+
+            var fact = facts.FirstOrDefault(f => f.ChannelTypeId == ChannelType.Email);
+            if (fact != null)
+            {
+                Assert.AreEqual(3, fact.DomainId);
+                Assert.AreEqual(SubscriberIp, fact.ClientIp);
+                Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
             }
 
-            Assert.AreEqual(true, result.WasAlreadyOnList);
+            fact = facts.FirstOrDefault(f => f.ChannelTypeId == ChannelType.SmsMms);
+            if (fact != null)
+            {
+                Assert.AreEqual(null, fact.DomainId);
+                Assert.AreEqual(SubscriberIp, fact.ClientIp);
+                Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
+            }
+        }
+
+        private Tuple<AddSubscriberResult, FactSubscription[]> WasAdded(MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
+        {
+            AddSubscriberResult result = null;
+            FactSubscription[] facts = null;
+
+            try
+            {
+                result = SM_AddAndUpdate(matchBy)
+                    .AddSubscriber(
+                        ActiveNotSubscribedListId,
+                        id: subscriberId,
+                        email: email,
+                        emailMd5: emailMd5,
+                        phone: phone,
+                        customSubscriberId: customSubscriberId,
+                        firstName: "Jan",
+                        lastName: "Kowalski",
+                        trackingCode: null,
+                        vendor: null,
+                        ip: SubscriberIp,
+                        propertiesDictionary: new Dictionary<int, object>
+                        {
+                            {RequiredPropertyString, "jakiś blok"},
+                            {RequiredPropertyInt, 7897987},
+                            {DeletedProperty, "jakiś blok"}
+                        }
+                    );
+
+                facts = LoadSubscriptions(result.SubscriberId, result.ListId).ToArray();
+            }
+            catch (SubscriberManagerException ex)
+            {
+                //if (ifErrorConditition == null)
+                //{
+                //    ifErrorConditition = exx =>
+                //        exx.PropertiesErrors.SingleOrDefault(e => e.Key == RequiredPropertyInt).Value.Contains(string.Format(Resources.SubscriberManager.InvalidValue, "cecha liczbowa xx3"));
+                //}
+
+                //if (ifErrorConditition(ex))
+                //    throw ex;
+            }
+
+            Assert.IsNotNull(result);
+            if (result != null)
+            {
+                Assert.AreEqual(true, result.WasAdded && result.SubscriberId > 0 && result.ListId == ActiveNotSubscribedListId);
+            }
+
+            Assert.IsNotNull(facts);
+            Assert.AreNotEqual(0, facts.Length);
+
+            return new Tuple<AddSubscriberResult, FactSubscription[]>(result, facts);
+        }
+        #endregion
+
+        #region ReplaceSubscriber
+
+        [TestMethod]
+        public void AddSubscriber_Email_ReplaceSubscriber_Test()
+        {
+            var result = ReplaceSubscriber(MatchBy.Email, email: ExistEmail);
+        }
+
+        [TestMethod]
+        public void AddSubscriber_Phone_ReplaceSubscriber_Test()
+        {
+            var result = ReplaceSubscriber(MatchBy.Phone, phone: ExistPhone);
+        }
+
+        private AddSubscriberResult ReplaceSubscriber(MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
+        {
+            AddSubscriberResult result = null;
+            FactSubscription fact = null;
+
+            try
+            {
+                result = SM_AddAndReplace(matchBy)
+                    .AddSubscriber(
+                        ActiveSubscribedListId,
+                        id: subscriberId,
+                        email: email,
+                        emailMd5: emailMd5,
+                        phone: phone,
+                        customSubscriberId: customSubscriberId,
+                        firstName: "Jan",
+                        lastName: "Kowalski",
+                        trackingCode: null,
+                        vendor: null,
+                        ip: SubscriberIp,
+                        propertiesDictionary: new Dictionary<int, object>
+                        {
+                            {RequiredPropertyString, "jakiś blok"},
+                            {RequiredPropertyInt, 7897987},
+                            {DeletedProperty, "jakiś blok"}
+                        }
+                    );
+
+                fact = LoadSubscriptions(result.SubscriberId, result.ListId).FirstOrDefault();
+            }
+            catch (SubscriberManagerException ex)
+            {
+                //if (ifErrorConditition == null)
+                //{
+                //    ifErrorConditition = exx =>
+                //        exx.PropertiesErrors.SingleOrDefault(e => e.Key == RequiredPropertyInt).Value.Contains(string.Format(Resources.SubscriberManager.InvalidValue, "cecha liczbowa xx3"));
+                //}
+
+                //if (ifErrorConditition(ex))
+                //    throw ex;
+            }
+            
+            Assert.IsNotNull(result);
+            if (result != null)
+            {
+                Assert.AreEqual(true, result.WasAlreadyOnList);
+            }
+
+            Assert.IsNotNull(fact);
+            if (fact != null)
+            {
+                Assert.AreEqual(3, fact.DomainId);
+                Assert.AreEqual(SubscriberIp, fact.ClientIp);
+                Assert.AreEqual(ChannelType.Email, fact.ChannelTypeId);
+
+                Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
+            }
+
+            return result;
+        }
+        #endregion
+
+        #region DeleteNotExists
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void DeleteSubscriber_Email_NotExists_Test()
+        {
+            var result = DeleteNotExists(ChannelType.Email, subscriberId: NotExistSubscriberId, listId: ActiveSubscribedListId);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void DeleteSubscriber_NotExists_Test()
+        public void DeleteSubscriber_Phone_NotExists_Test()
         {
+            var result = DeleteNotExists(ChannelType.SmsMms, subscriberId: NotExistSubscriberId, listId: ActiveSubscribedListId);
+        }
+
+        private List<RemovalModel> DeleteNotExists(ChannelType channelType, int subscriberId, int listId, Guid? messageGuid = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
+        {
+            List<RemovalModel> result = null;
             var subscriberManager = Container.GetInstance<SubscriberManager>();
 
-            using (var tran = Container.GetInstance<ISession>().BeginTransaction())
+            try
             {
-                try
-                {
-                    subscriberManager
-                        .DeleteSubscriber(
-                            subscriberId: NotExistSubscriberId,
-                            messageGuid: null,
-                            channelType: ChannelType.Email,
-                            listId: ActiveSubscribedListId,
-                            unitId: CurrentUnitId,
-                            reason: UnsubscribeReason.Api,
-                            browser: null,
-                            browserVersion: null,
-                            device: null,
-                            deviceVersion: null,
-                            environment: null,
-                            environmentVersion: null,
-                            renderingEngine: null,
-                            renderingEngineVersion: null,
-                            isMobile: false,
-                            clientLanguage: null,
-                            clientEmailDomain: null
-                        );
-                }
-                finally
-                {
-                    // przywracamy zmienione obiekty do poprzedniego stanu
-                    tran.Rollback();
-                }
+                result = subscriberManager
+                    .DeleteSubscriber(
+                        subscriberId: subscriberId,
+                        messageGuid: messageGuid,
+                        listId: listId,
+                        unitId: CurrentUnitId,
+                        reason: UnsubscribeReason.Api,
+                        channelType: channelType,
+                        browser: null,
+                        browserVersion: null,
+                        device: null,
+                        deviceVersion: null,
+                        environment: null,
+                        environmentVersion: null,
+                        renderingEngine: null,
+                        renderingEngineVersion: null,
+                        isMobile: false,
+                        clientLanguage: null,
+                        clientEmailDomain: null
+                    );
+            }
+            catch (SubscriberManagerException ex)
+            {
+                //if (ifErrorConditition == null)
+                //{
+                //    ifErrorConditition = exx =>
+                //        exx.PropertiesErrors.SingleOrDefault(e => e.Key == RequiredPropertyInt).Value.Contains(string.Format(Resources.SubscriberManager.InvalidValue, "cecha liczbowa xx3"));
+                //}
+
+                //if (ifErrorConditition(ex))
+                //    throw ex;
+            }
+
+            return result;
+        }
+        #endregion
+        
+        #region DeleteExist
+
+        [TestMethod]
+        public void DeleteSubscriber_Email_Exist_Test()
+        {
+            var result = DeleteExist(channelType: ChannelType.Email, subscriberId: ExistSubscriberId, listId: ActiveSubscribedListId);
+        }
+
+        [TestMethod]
+        public void DeleteSubscriber_Phone_Exist_Test()
+        {
+            var result = DeleteExist(channelType: ChannelType.SmsMms, subscriberId: ExistSubscriberId, listId: ActiveSubscribedListId);
+        }
+
+        private List<RemovalModel> DeleteExist(ChannelType channelType, int subscriberId, int listId, Guid? messageGuid = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
+        {
+            List<RemovalModel> result = null;
+
+            var subscriberManager = Container.GetInstance<SubscriberManager>();
+
+            try
+            {
+                result = subscriberManager
+                    .DeleteSubscriber(
+                       subscriberId: subscriberId,
+                        messageGuid: messageGuid,
+                        listId: listId,
+                        unitId: CurrentUnitId,
+                        reason: UnsubscribeReason.Api,
+                        channelType: channelType,
+                        browser: null,
+                        browserVersion: null,
+                        device: null,
+                        deviceVersion: null,
+                        environment: null,
+                        environmentVersion: null,
+                        renderingEngine: null,
+                        renderingEngineVersion: null,
+                        isMobile: false,
+                        clientLanguage: null,
+                        clientEmailDomain: null
+                    );
+            }
+            catch (SubscriberManagerException ex)
+            { 
+                //if (ifErrorConditition == null)
+                //{
+                //    ifErrorConditition = exx =>
+                //        exx.PropertiesErrors.SingleOrDefault(e => e.Key == RequiredPropertyInt).Value.Contains(string.Format(Resources.SubscriberManager.InvalidValue, "cecha liczbowa xx3"));
+                //}
+
+                //if (ifErrorConditition(ex))
+                //    throw ex;
+            }
+
+            Assert.IsNotNull(result);
+            if (result != null)
+            {
+                Assert.AreEqual(1, result.Count(r => r.ListId == ActiveSubscribedListId));
+            }
+
+            return result;
+        }
+
+        #endregion
+
+        #region ChangeContacts
+
+        [TestMethod]
+        public void AddSubscriber_Email_I_ChangeContacts_Test()
+        {
+            var result = ChangeContacts(MatchBy.Id, subscriberId: ExistSubscriberId, email: NotExistEmail);
+
+            Assert.AreEqual(NotExistEmail, result.Item1.SubscriberEmail);
+
+           var facts = result.Item2;
+            Assert.AreEqual(1, facts.Length);
+
+            var fact = facts.FirstOrDefault(f => f.ChannelTypeId == ChannelType.Email);
+            if (fact != null)
+            {
+                Assert.AreEqual(3, fact.DomainId);
+                Assert.AreEqual(SubscriberIp, fact.ClientIp);
+                Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
+
+                Assert.AreEqual(ChannelType.Email, fact.ChannelTypeId);
             }
         }
 
         [TestMethod]
-        public void DeleteSubscriber_Exist_Test()
+        public void AddSubscriber_Email_5_ChangeContacts_Test()
         {
-            List<RemovalModel> result;
+            var result = ChangeContacts(MatchBy.Email, emailMd5: ExistMd5, email: NotExistEmail);
 
-            var subscriberManager = Container.GetInstance<SubscriberManager>();
+            Assert.AreEqual(NotExistEmail, result.Item1.SubscriberEmail);
 
-            using (var tran = Container.GetInstance<ISession>().BeginTransaction())
+            var facts = result.Item2;
+            Assert.AreEqual(1, facts.Length);
+
+            var fact = facts.FirstOrDefault(f => f.ChannelTypeId == ChannelType.Email);
+            if (fact != null)
             {
-                try
-                {
-                    result = subscriberManager
-                        .DeleteSubscriber(
-                            subscriberId: ExistSubscriberId,
-                            messageGuid: null,
-                            channelType: ChannelType.Email,
-                            listId: ActiveSubscribedListId,
-                            unitId: CurrentUnitId,
-                            reason: UnsubscribeReason.Api,
-                            browser: null,
-                            browserVersion: null,
-                            device: null,
-                            deviceVersion: null,
-                            environment: null,
-                            environmentVersion: null,
-                            renderingEngine: null,
-                            renderingEngineVersion: null,
-                            isMobile: false,
-                            clientLanguage: null,
-                            clientEmailDomain: null
-                        );
-                }
-                finally
-                {
-                    // przywracamy zmienione obiekty do poprzedniego stanu
-                    tran.Rollback();
-                }
+                Assert.AreEqual(3, fact.DomainId);
+                Assert.AreEqual(SubscriberIp, fact.ClientIp);
+                Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
+
+                Assert.AreEqual(ChannelType.Email, fact.ChannelTypeId);
+            }
+        }
+
+        [TestMethod]
+        public void AddSubscriber_Custom_EP_ChangeContacts_Test()
+        {
+            var result = ChangeContacts(MatchBy.CustomSubscriberId, customSubscriberId: ExistCustomSubscriberId, email: NotExistEmail, phone: NotExistPhone);
+
+            Assert.AreEqual(NotExistEmail, result.Item1.SubscriberEmail);
+
+            var facts = result.Item2;
+            Assert.AreEqual(2, facts.Length);
+
+            var fact = facts.FirstOrDefault(f => f.ChannelTypeId == ChannelType.Email);
+            if (fact != null)
+            {
+                Assert.AreEqual(3, fact.DomainId);
+                Assert.AreEqual(SubscriberIp, fact.ClientIp);
+                Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
             }
 
-            Assert.AreEqual(1, result.Count(r => r.ListId == ActiveSubscribedListId));
+            fact = facts.FirstOrDefault(f => f.ChannelTypeId == ChannelType.SmsMms);
+            if (fact != null)
+            {
+                Assert.AreEqual(null, fact.DomainId);
+                Assert.AreEqual(SubscriberIp, fact.ClientIp);
+                Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
+            }
+
+            var subscriber = LoadSubscriber(result.Item1.SubscriberId);
+            Assert.IsNotNull(subscriber);
+            Assert.AreEqual(NotExistEmail, subscriber.Email);
+            Assert.AreEqual(NotExistPhone, subscriber.Phone);
         }
+
+        private Tuple<AddSubscriberResult, FactSubscription[]> ChangeContacts(MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
+        {
+            AddSubscriberResult result = null;
+            FactSubscription[] facts = null;
+
+            try
+            {
+                result = SM_AddAndUpdate(matchBy)
+                    .AddSubscriber(
+                        ActiveNotSubscribedListId,
+                        id: subscriberId,
+                        email: email,
+                        emailMd5: emailMd5,
+                        phone: phone,
+                        customSubscriberId: customSubscriberId,
+                        firstName: "Jan",
+                        lastName: "Kowalski",
+                        trackingCode: null,
+                        vendor: null,
+                        ip: SubscriberIp,
+                        propertiesDictionary: new Dictionary<int, object>
+                        {
+                            {RequiredPropertyString, "jakiś blok"},
+                            {RequiredPropertyInt, 7897987},
+                            {DeletedProperty, "jakiś blok"}
+                        }
+                    );
+
+                facts = LoadSubscriptions(result.SubscriberId, result.ListId).ToArray();
+            }
+            catch (SubscriberManagerException ex)
+            {
+                if (ifErrorConditition(ex))
+                    throw ex;
+            }
+
+            Assert.IsNotNull(result);
+            if (result != null)
+            {
+                Assert.AreEqual(true, result.WasAddedToList && result.SubscriberId == ExistSubscriberId && result.ListId == ActiveNotSubscribedListId);
+            }
+
+            Assert.IsNotNull(facts);
+            Assert.AreNotEqual(0, facts.Length);
+
+            return new Tuple<AddSubscriberResult, FactSubscription[]>(result, facts);
+        }
+        #endregion
 
         #region GetSubscriberManager
 
-        private SubscriberManager SM_AddAndIgnore()
+        private SubscriberManager SM_AddAndIgnore(MatchBy matchBy)
         {
             var subscriberManager = Container.GetInstance<SubscriberManager>();
             return subscriberManager
@@ -544,7 +1298,7 @@ namespace Multi.WebDaoTests.TestsLib
                     CurrentUnitId,
                     SubscriberManagerMode.AddAndIgnore,
                     SubscriptionSource.Api,
-                    matchBy: MatchBy.Email,
+                    matchBy: matchBy,
                     forceConfirmation: false,
                     addUnsubscribed: false,
                     addUnsubscribedByUser: false,
@@ -552,7 +1306,7 @@ namespace Multi.WebDaoTests.TestsLib
                 );
         }
 
-        private SubscriberManager SM_AddAndUpdate()
+        private SubscriberManager SM_AddAndUpdate(MatchBy matchBy)
         {
             var subscriberManager = Container.GetInstance<SubscriberManager>();
             return subscriberManager
@@ -560,7 +1314,7 @@ namespace Multi.WebDaoTests.TestsLib
                     CurrentUnitId,
                     SubscriberManagerMode.AddAndUpdate,
                     SubscriptionSource.Api,
-                    matchBy: MatchBy.Email,
+                    matchBy: matchBy,
                     forceConfirmation: false,
                     addUnsubscribed: false,
                     addUnsubscribedByUser: false,
@@ -568,7 +1322,7 @@ namespace Multi.WebDaoTests.TestsLib
                 );
         }
 
-        private SubscriberManager SM_AddAndUpdate_AllowUnsubscribedByUser()
+        private SubscriberManager SM_AddAndUpdate_AddUnsubscribed(MatchBy matchBy)
         {
             var subscriberManager = Container.GetInstance<SubscriberManager>();
             return subscriberManager
@@ -576,7 +1330,23 @@ namespace Multi.WebDaoTests.TestsLib
                     CurrentUnitId,
                     SubscriberManagerMode.AddAndUpdate,
                     SubscriptionSource.Api,
-                    matchBy: MatchBy.Email,
+                    matchBy: matchBy,
+                    forceConfirmation: false,
+                    addUnsubscribed: true,
+                    addUnsubscribedByUser: false,
+                    subscriptionLanguage: "en-US"
+                );
+        }
+
+        private SubscriberManager SM_AddAndUpdate_AllowUnsubscribedByUser(MatchBy matchBy)
+        {
+            var subscriberManager = Container.GetInstance<SubscriberManager>();
+            return subscriberManager
+                .PreAddSubscriber(
+                    CurrentUnitId,
+                    SubscriberManagerMode.AddAndUpdate,
+                    SubscriptionSource.Api,
+                    matchBy: matchBy,
                     forceConfirmation: false,
                     addUnsubscribed: false,
                     addUnsubscribedByUser: true,
@@ -584,7 +1354,7 @@ namespace Multi.WebDaoTests.TestsLib
                 );
         }
 
-        private SubscriberManager SM_AddAndReplace()
+        private SubscriberManager SM_AddAndReplace(MatchBy matchBy)
         {
             var subscriberManager = Container.GetInstance<SubscriberManager>();
             return subscriberManager
@@ -592,12 +1362,73 @@ namespace Multi.WebDaoTests.TestsLib
                     CurrentUnitId,
                     SubscriberManagerMode.AddAndReplace,
                     SubscriptionSource.Api,
-                    matchBy: MatchBy.Email,
+                    matchBy: matchBy,
                     forceConfirmation: false,
                     addUnsubscribed: false,
                     addUnsubscribedByUser: false,
                     subscriptionLanguage: "en-US"
                 );
+        }
+        #endregion
+
+        #region Load ChangedData
+
+        private IEnumerable<FactSubscription> LoadSubscriptions(int subscriberId, int listId)
+        {
+            var factSubscriptionsTable = $"[ES_DW_Unit_{CurrentUnitId}].[dbo].FactSubscriptions";
+            var dao = Container.GetInstance<IDimensionDao>();
+
+            var select = new SelectBuilder("Id,DateTimeId,DomainId,ListId,ClientIP,SubscriptionSourceId,ChannelTypeId")
+                .From(factSubscriptionsTable)
+                .Where(new {SubscriberId = subscriberId, ListId = listId})
+                .MainClause;
+
+            var results = dao.SelectMany((SelectBuilder)select).Select(f => new FactSubscription
+            {
+                Id = f.Id,
+                DateTimeId = f.DateTimeId,
+                DomainId = f.DomainId,
+                ListId = f.ListId,
+                ClientIp = f.ClientIP,
+                SubscriptionSourceId = (SubscriptionSource)f.SubscriptionSourceId,
+                ChannelTypeId = (ChannelType)f.ChannelTypeId,
+            });
+
+            return results.OrderByDescending(f => f.DateTimeId);
+        }
+
+        private class FactSubscription
+        {
+            public int Id { get; set; }
+            public DateTime DateTimeId { get; set; }
+            public int? DomainId { get; set; }
+            public int ListId { get; set; }
+            public string ClientIp { get; set; }
+            public SubscriptionSource SubscriptionSourceId { get; set; }
+            public ChannelType ChannelTypeId { get; set; }
+        }
+
+        private SubscribedOne LoadSubscriber(int subscriberId)
+        {
+            var dao = Container.GetInstance<ISubscriberDao>();
+
+            var subscribedOne = dao.Find(s => new SubscribedOne
+            {
+                Id = s.Id,
+                Email = s.Email,
+                EmailMd5 = s.EmailMd5,
+                Phone = s.Phone
+                
+            }, s => s.Id == subscriberId).FirstOrDefault();
+            return subscribedOne;
+        }
+
+        private class SubscribedOne
+        {
+            public int Id { get; set; }
+            public string Email { get; set; }
+            public byte[] EmailMd5 { get; set; }
+            public string Phone { get; set; }
         }
         #endregion
     }

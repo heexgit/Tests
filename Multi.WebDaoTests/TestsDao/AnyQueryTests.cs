@@ -5,6 +5,7 @@ using System.Linq;
 using ExpertSender.Common.Dao;
 using ExpertSender.DataModel;
 using ExpertSender.DataModel.Dao;
+using ExpertSender.DataModel.SmsMms;
 using NHibernate;
 using Multi.WebDaoTests.Core;
 using EsAppContext = Multi.WebDaoTests.Mocks.EsAppContext;
@@ -23,8 +24,22 @@ namespace Multi.WebDaoTests.TestsDao
         {
             //GetCacheStatusTest();
             //LoadListSettingDictionary();
-            LoadSubscribedOn();
+            //LoadSubscribedOn();
             //ChangeSubscribedOn();
+            LoadSmsMmsShipment();
+            LoadSmsMmsShipmentTarget();
+        }
+
+        private void LoadSmsMmsShipment()
+        {
+            var dao = Container.GetInstance<IWebDao<SmsMmsShipment>>();
+            var shipment = dao.Get(1);
+        }
+
+        private void LoadSmsMmsShipmentTarget()
+        {
+            var dao = Container.GetInstance<IWebDao<SmsMmsShipmentTarget>>();
+            var shipmentTarget = dao.Get(1);
         }
 
         private void GetCacheStatusTest()

@@ -55,8 +55,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.Common\ExpertSender.Common.csproj">
-      <Project>{58cc1440-50b4-41c8-98f4-d259250fc53e}</Project>
+    <ProjectReference Include="..\..\..\vso\ExpertSender 2 MultiChannel\Dev\Src\ExpertSender.Common\ExpertSender.Common.csproj">
+      <Project>{da5092d0-2ede-4a48-a5e3-61a10258bc0d}</Project>
       <Name>ExpertSender.Common</Name>
     </ProjectReference>
   </ItemGroup>

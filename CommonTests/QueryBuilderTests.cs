@@ -292,7 +292,41 @@ namespace CommonTests
             Assert.AreEqual(expected, actual);
         }
 
+        [TestMethod]
+        public void Select_ByIds_Test()
+        {
+            var ids = new []{ 3, 4, 8};
+
+            var actual = NewQueryBuilder
+                .Select(new SelectBuilder(new {Id = 0, TableName = string.Empty}))
+		        .From(new FromBuilder($"{MockEntityName}"))
+		        .Where(new WhereBuilder().Where(new
+		        {
+		            Id = ids
+		        }))
+                .GetQuery();
+
+            var expected = $@"SELECT Id,TableName FROM {MockEntityName} WHERE Id IN @Id";
+
+            Assert.AreEqual(expected, actual);
+        }
+
         #endregion
+
+        //#region MERGE
+        //[TestMethod]
+        //public void Merge_Basic_Test()
+        //{
+        //    var actual = NewQueryBuilder
+        //        .Merge(new MergeBuilder<MockEntity>())
+        //        .Values(new ValuesBuilder(new { Name = "Ala", Age = 12 }))
+        //        .GetQuery();
+
+        //    var expected = $@"MERGE INTO {MockEntityName} AS trg USING (SELECT Name,Age) AS src ON src.Id=trg.Id WHEN MATCHED THEN UPDATE SET Name=@Name,Age=@Age WHEN NOT MATCHED THEN INSERT (Name,Age) VALUES(@Name1,@Age1)";
+
+        //    Assert.AreEqual(expected, actual);
+        //}
+        //#endregion
 
         private static ClauseInitiator NewQueryBuilder => new ClauseInitiator(new DapperMediator());
 

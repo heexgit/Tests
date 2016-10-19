@@ -23,13 +23,15 @@ namespace Multi.WebDaoTests.TestsDao
 
         public override void Start()
         {
-            GetTest();
-            NotExistsWithQueryBuilder_Test();
-            DoubleFieldsUsage_Test();
-            DoubleWhereUsage_Test();
-            InsertNullTest();
-            UpdateNullTest();
-            DoubleValuesInsert_Test();
+            //GetTest();
+            //NotExistsWithQueryBuilder_Test();
+            //DoubleFieldsUsage_Test();
+            //DoubleWhereUsage_Test();
+            //InsertNullTest();
+            //UpdateNullTest();
+            //DoubleValuesInsert_Test();
+            GetByEmailMd5();
+            GetWithDomainFamilyByEmailMd5();
         }
 
         private void GetTest()
@@ -101,7 +103,6 @@ namespace Multi.WebDaoTests.TestsDao
 
         private void DoubleFieldsUsage_Test()
         {
-            
             using (var tran = Container.GetInstance<ISession>().BeginTransaction())
             {
                 try
@@ -194,6 +195,61 @@ namespace Multi.WebDaoTests.TestsDao
                     tran.Rollback();
                 }
             }
+        }
+
+        private void GetByEmailMd5()
+        {
+            var emailMd5Binary = CryptographyHelper.HexStringToBytes("DC6A810C497071BEAD1DFC2449282A63");
+
+            var s = _dao.SelectOne(new SelectBuilder(new
+            {
+                Id = 0,
+                Email = string.Empty,
+                Firstname = string.Empty,
+                Lastname = string.Empty,
+                Ip = string.Empty,
+                TrackingCode = string.Empty,
+                Vendor = string.Empty,
+                DomainId = default(int?),
+                //DomainFamilyId = default(int?),
+                Phone = string.Empty,
+                DialingPrefix = string.Empty,
+                PhoneLocal = string.Empty,
+                CustomSubscriberId = string.Empty
+            }), new WhereBuilder(new
+            {
+                EmailMd5 = emailMd5Binary
+            }));
+        }
+
+        private void GetWithDomainFamilyByEmailMd5()
+        {
+            var emailMd5Binary = CryptographyHelper.HexStringToBytes("DC6A810C497071BEAD1DFC2449282A63");
+
+            var sb = new SelectBuilder(new
+            {
+                s_Id = 0,
+                Email = string.Empty,
+                Firstname = string.Empty,
+                Lastname = string.Empty,
+                Ip = string.Empty,
+                TrackingCode = string.Empty,
+                Vendor = string.Empty,
+                DomainId = default(int?),
+                d_DomainFamilyId = default(int?),
+                Phone = string.Empty,
+                DialingPrefix = string.Empty,
+                PhoneLocal = string.Empty,
+                CustomSubscriberId = string.Empty
+            })
+            .From(new FromBuilder("Subscriber", "s"))
+            .Join(new JoinBuilder("Domain", "d")).On(new OnBuilder("d.Id=s.DomainId"))
+            .Where(new WhereBuilder(new
+            {
+                EmailMd5 = emailMd5Binary
+            }));
+
+            var s = _dao.SelectOne((SelectBuilder)sb.MainClause);
         }
     }
 }
