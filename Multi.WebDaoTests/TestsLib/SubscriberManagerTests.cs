@@ -1288,6 +1288,113 @@ namespace Multi.WebDaoTests.TestsLib
         }
         #endregion
 
+        #region ChangeSubscriberData
+
+        [TestMethod]
+        public void AddSubscriber_Email_Update_ChangeSubscriberData_Test()
+        {
+            var result = ChangeSubscriberData(true, MatchBy.Email, email: ExistEmail);
+
+            Assert.AreEqual(ExistEmail, result.Item1.SubscriberEmail);
+
+           var facts = result.Item2;
+            Assert.AreEqual(1, facts.Length);
+
+            var fact = facts.FirstOrDefault(f => f.ChannelTypeId == ChannelType.Email);
+            if (fact != null)
+            {
+                Assert.AreEqual(3, fact.DomainId);
+                Assert.AreEqual(SubscriberIp, fact.ClientIp);
+                Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
+
+                Assert.AreEqual(ChannelType.Email, fact.ChannelTypeId);
+            }
+
+            var subscriber = LoadSubscriber(result.Item1.SubscriberId);
+            Assert.IsNotNull(subscriber);
+            Assert.AreEqual(ExistEmail, subscriber.Email);
+            Assert.AreEqual("Jan", subscriber.Firstname);
+            Assert.AreEqual("Nowacki", subscriber.Lastname);
+        }
+
+        [TestMethod]
+        public void AddSubscriber_Email_Replace_ChangeSubscriberData_Test()
+        {
+            var result = ChangeSubscriberData(false, MatchBy.Email, email: ExistEmail);
+
+            Assert.AreEqual(ExistEmail, result.Item1.SubscriberEmail);
+
+            var facts = result.Item2;
+            Assert.AreEqual(1, facts.Length);
+
+            var fact = facts.FirstOrDefault(f => f.ChannelTypeId == ChannelType.Email);
+            if (fact != null)
+            {
+                Assert.AreEqual(3, fact.DomainId);
+                Assert.AreEqual(SubscriberIp, fact.ClientIp);
+                Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
+
+                Assert.AreEqual(ChannelType.Email, fact.ChannelTypeId);
+            }
+
+            var subscriber = LoadSubscriber(result.Item1.SubscriberId);
+            Assert.IsNotNull(subscriber);
+            Assert.AreEqual(ExistEmail, subscriber.Email);
+            Assert.IsNull(subscriber.Firstname);
+            Assert.AreEqual("Nowacki", subscriber.Lastname);
+        }
+
+        private Tuple<AddSubscriberResult, FactSubscription[]> ChangeSubscriberData(bool isUpdate, MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
+        {
+            AddSubscriberResult result = null;
+            FactSubscription[] facts = null;
+
+            var sm = isUpdate ? SM_AddAndUpdate(matchBy) : SM_AddAndReplace(matchBy);
+
+            try
+            {
+                result = sm
+                    .AddSubscriber(
+                        ActiveNotSubscribedListId,
+                        id: subscriberId,
+                        email: email,
+                        emailMd5: emailMd5,
+                        phone: phone,
+                        customSubscriberId: customSubscriberId,
+                        firstName: "",
+                        lastName: "Nowacki",
+                        trackingCode: null,
+                        vendor: null,
+                        ip: SubscriberIp,
+                        propertiesDictionary: new Dictionary<int, object>
+                        {
+                            {RequiredPropertyString, "jakiś blok"},
+                            {RequiredPropertyInt, 7897987},
+                            {DeletedProperty, "jakiś blok"}
+                        }
+                    );
+
+                facts = LoadSubscriptions(result.SubscriberId, result.ListId).ToArray();
+            }
+            catch (SubscriberManagerException ex)
+            {
+                //if (ifErrorConditition(ex))
+                    throw ex;
+            }
+
+            Assert.IsNotNull(result);
+            if (result != null)
+            {
+                Assert.AreEqual(true, result.WasAddedToList && result.SubscriberId == ExistSubscriberId && result.ListId == ActiveNotSubscribedListId);
+            }
+
+            Assert.IsNotNull(facts);
+            Assert.AreNotEqual(0, facts.Length);
+
+            return new Tuple<AddSubscriberResult, FactSubscription[]>(result, facts);
+        }
+        #endregion
+
         #region GetSubscriberManager
 
         private SubscriberManager SM_AddAndIgnore(MatchBy matchBy)
@@ -1417,7 +1524,9 @@ namespace Multi.WebDaoTests.TestsLib
                 Id = s.Id,
                 Email = s.Email,
                 EmailMd5 = s.EmailMd5,
-                Phone = s.Phone
+                Phone = s.Phone,
+                Firstname = s.Firstname,
+                Lastname = s.Lastname
                 
             }, s => s.Id == subscriberId).FirstOrDefault();
             return subscribedOne;
@@ -1429,6 +1538,8 @@ namespace Multi.WebDaoTests.TestsLib
             public string Email { get; set; }
             public byte[] EmailMd5 { get; set; }
             public string Phone { get; set; }
+            public string Firstname { get; set; }
+            public string Lastname { get; set; }
         }
         #endregion
     }
