@@ -31,10 +31,12 @@ namespace Multi.WebDaoTests.TestsLib
 
         private const int NotExistSubscriberId = -1;
         private const string NotExistEmail = "xyz19872842@expertsender.com";
-        private const string NotExistMd5 = "00000000000000000000000449282A63";
+        private const string NotExistMd5 = "158DC5A944BA94E12E95F3A70DC5FB49";
         private const string NotExistPhone = "1441872842";
         private const string NotExistCustomSubscriberId = "xxppeoo3994hdfhs";
 
+        private const string SubscriberFirstname = "Jan";
+        private const string SubscriberLastname = "Kowalski";
         private const string SubscriberIp = "123.9.88.99";
 
         /// <summary>
@@ -114,14 +116,14 @@ namespace Multi.WebDaoTests.TestsLib
 
         [TestMethod]
         [ExpectedException(typeof(SubscriberManagerException))]
-        public void AddSubscriber_Email_EP5_ListDoesNotBelongToService_Test()
+        public void AddSubscriber_Email_EPD_ListDoesNotBelongToService_Test()
         {
             ListDoesNotBelongToService(MatchBy.Email, email: ExistEmail, phone: ExistPhone, emailMd5: ExistMd5);
         }
 
         [TestMethod]
         [ExpectedException(typeof(SubscriberManagerException))]
-        public void AddSubscriber_Phone_EP5_ListDoesNotBelongToService_Test()
+        public void AddSubscriber_Phone_EPD_ListDoesNotBelongToService_Test()
         {
             ListDoesNotBelongToService(MatchBy.Phone, email: ExistEmail, phone: ExistPhone, emailMd5: ExistMd5);
         }
@@ -140,8 +142,8 @@ namespace Multi.WebDaoTests.TestsLib
                         emailMd5: emailMd5,
                         phone: phone,
                         customSubscriberId: customSubscriberId,
-                        firstName: "Jan",
-                        lastName: "Kowalski",
+                        firstName: SubscriberFirstname,
+                        lastName: SubscriberLastname,
                         trackingCode: null,
                         vendor: null,
                         ip: SubscriberIp,
@@ -199,7 +201,7 @@ namespace Multi.WebDaoTests.TestsLib
 
         [TestMethod]
         [ExpectedException(typeof(NotFoundException))]
-        public void AddSubscriber_Email_P5_FieldIsRequired_Test()
+        public void AddSubscriber_Email_PD_FieldIsRequired_Test()
         {
             FieldIsRequired(
                 MatchBy.Email,
@@ -211,7 +213,7 @@ namespace Multi.WebDaoTests.TestsLib
 
         [TestMethod]
         [ExpectedException(typeof(SubscriberManagerException))]
-        public void AddSubscriber_Phone_E5_FieldIsRequired_Test()
+        public void AddSubscriber_Phone_ED_FieldIsRequired_Test()
         {
             FieldIsRequired(
                 MatchBy.Phone,
@@ -308,6 +310,58 @@ namespace Multi.WebDaoTests.TestsLib
             );
         }
 
+        [TestMethod]
+        [ExpectedException(typeof(SubscriberManagerException))]
+        public void AddSubscriber_Email_EPx_FieldIsRequired_Test()
+        {
+            var result = FieldIsRequired(
+                MatchBy.Email, 
+                email: NotExistEmail,
+                phone: "xxx",
+                ifErrorConditition: ex =>
+                    ex.FieldsErrors.SingleOrDefault(e => e.Key == "phone").Value.Contains(Resources.SubscriberManager.PhoneIsInvalid)
+            );
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(SubscriberManagerException))]
+        public void AddSubscriber_Email_EP000_FieldIsRequired_Test()
+        {
+            var result = FieldIsRequired(
+                MatchBy.Email, 
+                email: NotExistEmail,
+                phone: "123456789013467901346790",
+                ifErrorConditition: ex =>
+                    ex.FieldsErrors.SingleOrDefault(e => e.Key == "phone").Value.Any(v => v.StartsWith(Resources.SubscriberManager.PhoneTooLong.Substring(0, 20)))
+            );
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(SubscriberManagerException))]
+        public void AddSubscriber_Phone_ExP_FieldIsRequired_Test()
+        {
+            var result = FieldIsRequired(
+                MatchBy.Phone,
+                email: "xxx",
+                phone: NotExistPhone,
+                ifErrorConditition: ex =>
+                    ex.FieldsErrors.SingleOrDefault(e => e.Key == "email").Value.Contains(Resources.SubscriberManager.EmailIsInvalid)
+            );
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(SubscriberManagerException))]
+        public void AddSubscriber_Phone_E000P_FieldIsRequired_Test()
+        {
+            var result = FieldIsRequired(
+                MatchBy.Phone,
+                email: "#dss@sdsdsxxx.sooedm,W222",
+                phone: NotExistPhone,
+                ifErrorConditition: ex =>
+                    ex.FieldsErrors.SingleOrDefault(e => e.Key == "email").Value.Contains(Resources.SubscriberManager.EmailIsInvalid)
+            );
+        }
+
         private AddSubscriberResult FieldIsRequired(MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
         {
             AddSubscriberResult result = null;
@@ -322,8 +376,8 @@ namespace Multi.WebDaoTests.TestsLib
                         emailMd5: emailMd5,
                         phone: phone,
                         customSubscriberId: customSubscriberId,
-                        firstName: "Jan",
-                        lastName: "Kowalski",
+                        firstName: SubscriberFirstname,
+                        lastName: SubscriberLastname,
                         trackingCode: null,
                         vendor: null,
                         ip: SubscriberIp,
@@ -365,7 +419,7 @@ namespace Multi.WebDaoTests.TestsLib
 
         [TestMethod]
         [ExpectedException(typeof(SubscriberManagerException))]
-        public void AddSubscriber_Email_5_InvalidPropValue_Test()
+        public void AddSubscriber_Email_D_InvalidPropValue_Test()
         {
             InvalidPropValue(MatchBy.Email, emailMd5: ExistMd5);
         }
@@ -384,8 +438,8 @@ namespace Multi.WebDaoTests.TestsLib
                         emailMd5: emailMd5,
                         phone: phone,
                         customSubscriberId: customSubscriberId,
-                        firstName: "Jan",
-                        lastName: "Kowalski",
+                        firstName: SubscriberFirstname,
+                        lastName: SubscriberLastname,
                         trackingCode: null,
                         vendor: null,
                         ip: SubscriberIp,
@@ -441,8 +495,8 @@ namespace Multi.WebDaoTests.TestsLib
                         emailMd5: emailMd5,
                         phone: phone,
                         customSubscriberId: customSubscriberId,
-                        firstName: "Jan",
-                        lastName: "Kowalski",
+                        firstName: SubscriberFirstname,
+                        lastName: SubscriberLastname,
                         trackingCode: null,
                         vendor: null,
                         ip: SubscriberIp,
@@ -504,8 +558,8 @@ namespace Multi.WebDaoTests.TestsLib
                         emailMd5: emailMd5,
                         phone: phone,
                         customSubscriberId: customSubscriberId,
-                        firstName: "Jan",
-                        lastName: "Kowalski",
+                        firstName: SubscriberFirstname,
+                        lastName: SubscriberLastname,
                         trackingCode: null,
                         vendor: null,
                         ip: SubscriberIp,
@@ -555,10 +609,18 @@ namespace Multi.WebDaoTests.TestsLib
 
                 Assert.AreEqual(ChannelType.Email, fact.ChannelTypeId);
             }
+            
+            var subscriber = LoadSubscriber(result.Item1.SubscriberId);
+            Assert.IsNotNull(subscriber);
+
+            Assert.AreEqual(ExistEmail, subscriber.Email);
+            Assert.AreEqual(ExistMd5, CryptographyHelper.BytesToHexString(subscriber.EmailMd5).ToUpper());
+            Assert.AreEqual(fact.DomainId, subscriber.DomainId);
+            Assert.AreEqual(1000, subscriber.FamilyDomainId);
         }
 
         [TestMethod]
-        public void AddSubscriber_Email_5_WasAddedToList_Test()
+        public void AddSubscriber_Email_D_WasAddedToList_Test()
         {
             var result = WasAddedToList(MatchBy.Email, emailMd5: ExistMd5);
 
@@ -571,6 +633,14 @@ namespace Multi.WebDaoTests.TestsLib
 
                 Assert.AreEqual(ChannelType.Email, fact.ChannelTypeId);
             }
+            
+            var subscriber = LoadSubscriber(result.Item1.SubscriberId);
+            Assert.IsNotNull(subscriber);
+
+            Assert.AreEqual(ExistEmail, subscriber.Email);
+            Assert.AreEqual(ExistMd5, CryptographyHelper.BytesToHexString(subscriber.EmailMd5).ToUpper());
+            Assert.AreEqual(fact.DomainId, subscriber.DomainId);
+            Assert.AreEqual(1000, subscriber.FamilyDomainId);
         }
 
         [TestMethod]
@@ -587,6 +657,13 @@ namespace Multi.WebDaoTests.TestsLib
 
                 Assert.AreEqual(ChannelType.SmsMms, fact.ChannelTypeId);
             }
+
+            var subscriber = LoadSubscriber(result.Item1.SubscriberId);
+            Assert.IsNotNull(subscriber);
+
+            Assert.AreEqual(ExistPhone, subscriber.Phone);
+            Assert.IsTrue(ExistPhone.EndsWith(subscriber.PhoneLocal));
+            Assert.IsTrue(ExistPhone.StartsWith(subscriber.DialingPrefix));
         }
 
         private Tuple<AddSubscriberResult, FactSubscription> WasAddedToList(MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
@@ -604,8 +681,8 @@ namespace Multi.WebDaoTests.TestsLib
                         emailMd5: emailMd5,
                         phone: phone,
                         customSubscriberId: customSubscriberId,
-                        firstName: "Jan",
-                        lastName: "Kowalski",
+                        firstName: SubscriberFirstname,
+                        lastName: SubscriberLastname,
                         trackingCode: null,
                         vendor: null,
                         ip: SubscriberIp,
@@ -664,8 +741,8 @@ namespace Multi.WebDaoTests.TestsLib
                         emailMd5: emailMd5,
                         phone: phone,
                         customSubscriberId: customSubscriberId,
-                        firstName: "Jan",
-                        lastName: "Kowalski",
+                        firstName: SubscriberFirstname,
+                        lastName: SubscriberLastname,
                         trackingCode: null,
                         vendor: null,
                         ip: SubscriberIp,
@@ -726,8 +803,8 @@ namespace Multi.WebDaoTests.TestsLib
                         emailMd5: emailMd5,
                         phone: phone,
                         customSubscriberId: customSubscriberId,
-                        firstName: "Jan",
-                        lastName: "Kowalski",
+                        firstName: SubscriberFirstname,
+                        lastName: SubscriberLastname,
                         trackingCode: null,
                         vendor: null,
                         ip: SubscriberIp,
@@ -775,7 +852,14 @@ namespace Multi.WebDaoTests.TestsLib
 
                 Assert.AreEqual(ChannelType.Email, fact.ChannelTypeId);
             }
-        }
+
+            var subscriber = LoadSubscriber(result.Item1.SubscriberId);
+            Assert.IsNotNull(subscriber);
+
+            Assert.AreEqual(ExistEmail, subscriber.Email);
+            Assert.AreEqual(ExistMd5, CryptographyHelper.BytesToHexString(subscriber.EmailMd5).ToUpper());
+            Assert.AreEqual(fact.DomainId, subscriber.DomainId);
+            Assert.AreEqual(1000, subscriber.FamilyDomainId);        }
 
         [TestMethod]
         public void AddSubscriber_Phone_WasReAddedToList_Test()
@@ -791,6 +875,13 @@ namespace Multi.WebDaoTests.TestsLib
 
                 Assert.AreEqual(ChannelType.SmsMms, fact.ChannelTypeId);
             }
+            
+            var subscriber = LoadSubscriber(result.Item1.SubscriberId);
+            Assert.IsNotNull(subscriber);
+
+            Assert.AreEqual(ExistPhone, subscriber.Phone);
+            Assert.IsTrue(ExistPhone.EndsWith(subscriber.PhoneLocal));
+            Assert.IsTrue(ExistPhone.StartsWith(subscriber.DialingPrefix));
         }
 
         private Tuple<AddSubscriberResult, FactSubscription> WasReAddedToList(MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
@@ -808,8 +899,8 @@ namespace Multi.WebDaoTests.TestsLib
                         emailMd5: emailMd5,
                         phone: phone,
                         customSubscriberId: customSubscriberId,
-                        firstName: "Jan",
-                        lastName: "Kowalski",
+                        firstName: SubscriberFirstname,
+                        lastName: SubscriberLastname,
                         trackingCode: null,
                         vendor: null,
                         ip: SubscriberIp,
@@ -863,6 +954,82 @@ namespace Multi.WebDaoTests.TestsLib
 
                 Assert.AreEqual(ChannelType.Email, fact.ChannelTypeId);
             }
+
+            var subscriber = LoadSubscriber(result.Item1.SubscriberId);
+            Assert.IsNotNull(subscriber);
+
+            Assert.AreEqual(NotExistEmail, subscriber.Email);
+            Assert.AreEqual(NotExistMd5, CryptographyHelper.BytesToHexString(subscriber.EmailMd5).ToUpper());
+            Assert.AreEqual(fact.DomainId, subscriber.DomainId);
+            Assert.AreEqual(1000, subscriber.FamilyDomainId);
+
+            Assert.AreEqual(SubscriberIp, subscriber.Ip);
+            Assert.AreEqual(SubscriberLastname, subscriber.Lastname);
+            Assert.AreEqual(SubscriberFirstname, subscriber.Firstname);
+        }
+
+        [TestMethod]
+        public void AddSubscriber_Email_EP0_WasAdded_Test()
+        {
+            var result = WasAdded(MatchBy.Email, email: NotExistEmail, phone: string.Empty);
+
+            var fact = result.Item2.SingleOrDefault();
+            if (fact != null)
+            {
+                Assert.AreEqual(3, fact.DomainId);
+                Assert.AreEqual(SubscriberIp, fact.ClientIp);
+                Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
+
+                Assert.AreEqual(ChannelType.Email, fact.ChannelTypeId);
+            }
+
+            var subscriber = LoadSubscriber(result.Item1.SubscriberId);
+            Assert.IsNotNull(subscriber);
+
+            Assert.AreEqual(NotExistEmail, subscriber.Email);
+            Assert.AreEqual(NotExistMd5, CryptographyHelper.BytesToHexString(subscriber.EmailMd5).ToUpper());
+            Assert.AreEqual(fact.DomainId, subscriber.DomainId);
+            Assert.AreEqual(1000, subscriber.FamilyDomainId);
+
+            Assert.IsNull(subscriber.Phone);
+            Assert.IsNull(subscriber.PhoneLocal);
+            Assert.IsNull(subscriber.DialingPrefix);
+
+            Assert.AreEqual(SubscriberIp, subscriber.Ip);
+            Assert.AreEqual(SubscriberLastname, subscriber.Lastname);
+            Assert.AreEqual(SubscriberFirstname, subscriber.Firstname);
+        }
+
+        [TestMethod]
+        public void AddSubscriber_Email_EP1_WasAdded_Test()
+        {
+            var result = WasAdded(MatchBy.Email, email: NotExistEmail, phone: " ");
+
+            var fact = result.Item2.SingleOrDefault();
+            if (fact != null)
+            {
+                Assert.AreEqual(3, fact.DomainId);
+                Assert.AreEqual(SubscriberIp, fact.ClientIp);
+                Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
+
+                Assert.AreEqual(ChannelType.Email, fact.ChannelTypeId);
+            }
+
+            var subscriber = LoadSubscriber(result.Item1.SubscriberId);
+            Assert.IsNotNull(subscriber);
+
+            Assert.AreEqual(NotExistEmail, subscriber.Email);
+            Assert.AreEqual(NotExistMd5, CryptographyHelper.BytesToHexString(subscriber.EmailMd5).ToUpper());
+            Assert.AreEqual(fact.DomainId, subscriber.DomainId);
+            Assert.AreEqual(1000, subscriber.FamilyDomainId);
+
+            Assert.IsNull(subscriber.Phone);
+            Assert.IsNull(subscriber.PhoneLocal);
+            Assert.IsNull(subscriber.DialingPrefix);
+
+            Assert.AreEqual(SubscriberIp, subscriber.Ip);
+            Assert.AreEqual(SubscriberLastname, subscriber.Lastname);
+            Assert.AreEqual(SubscriberFirstname, subscriber.Firstname);
         }
 
         [TestMethod]
@@ -879,6 +1046,110 @@ namespace Multi.WebDaoTests.TestsLib
 
                 Assert.AreEqual(ChannelType.SmsMms, fact.ChannelTypeId);
             }
+
+            var subscriber = LoadSubscriber(result.Item1.SubscriberId);
+            Assert.IsNotNull(subscriber);
+
+            Assert.AreEqual(NotExistPhone, subscriber.Phone);
+            Assert.IsTrue(NotExistPhone.EndsWith(subscriber.PhoneLocal));
+            Assert.IsTrue(NotExistPhone.StartsWith(subscriber.DialingPrefix));
+
+            Assert.AreEqual(SubscriberIp, subscriber.Ip);
+            Assert.AreEqual(SubscriberLastname, subscriber.Lastname);
+            Assert.AreEqual(SubscriberFirstname, subscriber.Firstname);
+        }
+
+        [TestMethod]
+        public void AddSubscriber_Phone_E0P_WasAdded_Test()
+        {
+            var result = WasAdded(MatchBy.Phone, phone: NotExistPhone, email: string.Empty);
+
+            var fact = result.Item2.SingleOrDefault();
+            if (fact != null)
+            {
+                Assert.AreEqual(null, fact.DomainId);
+                Assert.AreEqual(SubscriberIp, fact.ClientIp);
+                Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
+
+                Assert.AreEqual(ChannelType.SmsMms, fact.ChannelTypeId);
+            }
+
+            var subscriber = LoadSubscriber(result.Item1.SubscriberId);
+            Assert.IsNotNull(subscriber);
+
+            Assert.IsNull(subscriber.Email);
+            Assert.IsNull(subscriber.DomainId);
+            Assert.IsNull(subscriber.FamilyDomainId);
+
+            Assert.AreEqual(NotExistPhone, subscriber.Phone);
+            Assert.IsTrue(NotExistPhone.EndsWith(subscriber.PhoneLocal));
+            Assert.IsTrue(NotExistPhone.StartsWith(subscriber.DialingPrefix));
+
+            Assert.AreEqual(SubscriberIp, subscriber.Ip);
+            Assert.AreEqual(SubscriberLastname, subscriber.Lastname);
+            Assert.AreEqual(SubscriberFirstname, subscriber.Firstname);
+        }
+
+        [TestMethod]
+        public void AddSubscriber_Phone_E1P_WasAdded_Test()
+        {
+            var result = WasAdded(MatchBy.Phone, phone: NotExistPhone, email: " ");
+
+            var fact = result.Item2.SingleOrDefault();
+            if (fact != null)
+            {
+                Assert.AreEqual(null, fact.DomainId);
+                Assert.AreEqual(SubscriberIp, fact.ClientIp);
+                Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
+
+                Assert.AreEqual(ChannelType.SmsMms, fact.ChannelTypeId);
+            }
+
+            var subscriber = LoadSubscriber(result.Item1.SubscriberId);
+            Assert.IsNotNull(subscriber);
+
+            Assert.IsNull(subscriber.Email);
+            Assert.IsNull(subscriber.DomainId);
+            Assert.IsNull(subscriber.FamilyDomainId);
+
+            Assert.AreEqual(NotExistPhone, subscriber.Phone);
+            Assert.IsTrue(NotExistPhone.EndsWith(subscriber.PhoneLocal));
+            Assert.IsTrue(NotExistPhone.StartsWith(subscriber.DialingPrefix));
+
+            Assert.AreEqual(SubscriberIp, subscriber.Ip);
+            Assert.AreEqual(SubscriberLastname, subscriber.Lastname);
+            Assert.AreEqual(SubscriberFirstname, subscriber.Firstname);
+        }
+
+        [TestMethod]
+        public void AddSubscriber_Phone_E3P_WasAdded_Test()
+        {
+            var result = WasAdded(MatchBy.Phone, phone: NotExistPhone, email: "   ");
+
+            var fact = result.Item2.SingleOrDefault();
+            if (fact != null)
+            {
+                Assert.AreEqual(null, fact.DomainId);
+                Assert.AreEqual(SubscriberIp, fact.ClientIp);
+                Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
+
+                Assert.AreEqual(ChannelType.SmsMms, fact.ChannelTypeId);
+            }
+
+            var subscriber = LoadSubscriber(result.Item1.SubscriberId);
+            Assert.IsNotNull(subscriber);
+
+            Assert.IsNull(subscriber.Email);
+            Assert.IsNull(subscriber.DomainId);
+            Assert.IsNull(subscriber.FamilyDomainId);
+
+            Assert.AreEqual(NotExistPhone, subscriber.Phone);
+            Assert.IsTrue(NotExistPhone.EndsWith(subscriber.PhoneLocal));
+            Assert.IsTrue(NotExistPhone.StartsWith(subscriber.DialingPrefix));
+
+            Assert.AreEqual(SubscriberIp, subscriber.Ip);
+            Assert.AreEqual(SubscriberLastname, subscriber.Lastname);
+            Assert.AreEqual(SubscriberFirstname, subscriber.Firstname);
         }
 
         [TestMethod]
@@ -904,6 +1175,22 @@ namespace Multi.WebDaoTests.TestsLib
                 Assert.AreEqual(SubscriberIp, fact.ClientIp);
                 Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
             }
+
+            var subscriber = LoadSubscriber(result.Item1.SubscriberId);
+            Assert.IsNotNull(subscriber);
+
+            Assert.AreEqual(NotExistPhone, subscriber.Phone);
+            Assert.IsTrue(NotExistPhone.EndsWith(subscriber.PhoneLocal));
+            Assert.IsTrue(NotExistPhone.StartsWith(subscriber.DialingPrefix));
+
+            Assert.AreEqual(NotExistEmail, subscriber.Email);
+            Assert.AreEqual(NotExistMd5, CryptographyHelper.BytesToHexString(subscriber.EmailMd5).ToUpper());
+            Assert.AreEqual(3, subscriber.DomainId);
+            Assert.AreEqual(1000, subscriber.FamilyDomainId);
+
+            Assert.AreEqual(SubscriberIp, subscriber.Ip);
+            Assert.AreEqual(SubscriberLastname, subscriber.Lastname);
+            Assert.AreEqual(SubscriberFirstname, subscriber.Firstname);
         }
 
         private Tuple<AddSubscriberResult, FactSubscription[]> WasAdded(MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
@@ -921,8 +1208,8 @@ namespace Multi.WebDaoTests.TestsLib
                         emailMd5: emailMd5,
                         phone: phone,
                         customSubscriberId: customSubscriberId,
-                        firstName: "Jan",
-                        lastName: "Kowalski",
+                        firstName: SubscriberFirstname,
+                        lastName: SubscriberLastname,
                         trackingCode: null,
                         vendor: null,
                         ip: SubscriberIp,
@@ -938,14 +1225,8 @@ namespace Multi.WebDaoTests.TestsLib
             }
             catch (SubscriberManagerException ex)
             {
-                //if (ifErrorConditition == null)
-                //{
-                //    ifErrorConditition = exx =>
-                //        exx.PropertiesErrors.SingleOrDefault(e => e.Key == RequiredPropertyInt).Value.Contains(string.Format(Resources.SubscriberManager.InvalidValue, "cecha liczbowa xx3"));
-                //}
-
-                //if (ifErrorConditition(ex))
-                //    throw ex;
+                if (ifErrorConditition(ex))
+                    throw ex;
             }
 
             Assert.IsNotNull(result);
@@ -990,8 +1271,8 @@ namespace Multi.WebDaoTests.TestsLib
                         emailMd5: emailMd5,
                         phone: phone,
                         customSubscriberId: customSubscriberId,
-                        firstName: "Jan",
-                        lastName: "Kowalski",
+                        firstName: SubscriberFirstname,
+                        lastName: SubscriberLastname,
                         trackingCode: null,
                         vendor: null,
                         ip: SubscriberIp,
@@ -1032,6 +1313,18 @@ namespace Multi.WebDaoTests.TestsLib
 
                 Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
             }
+
+            var subscriber = LoadSubscriber(result.SubscriberId);
+            Assert.IsNotNull(subscriber);
+
+            Assert.AreEqual(ExistEmail, subscriber.Email);
+            Assert.AreEqual(ExistMd5, CryptographyHelper.BytesToHexString(subscriber.EmailMd5).ToUpper());
+            Assert.AreEqual(fact.DomainId, subscriber.DomainId);
+            Assert.AreEqual(1000, subscriber.FamilyDomainId);
+
+            Assert.AreEqual(ExistPhone, subscriber.Phone);
+            Assert.IsTrue(ExistPhone.EndsWith(subscriber.PhoneLocal));
+            Assert.IsTrue(ExistPhone.StartsWith(subscriber.DialingPrefix));
 
             return result;
         }
@@ -1184,10 +1477,18 @@ namespace Multi.WebDaoTests.TestsLib
 
                 Assert.AreEqual(ChannelType.Email, fact.ChannelTypeId);
             }
+
+            var subscriber = LoadSubscriber(result.Item1.SubscriberId);
+            Assert.IsNotNull(subscriber);
+
+            Assert.AreEqual(NotExistEmail, subscriber.Email);
+            Assert.AreEqual(NotExistMd5, CryptographyHelper.BytesToHexString(subscriber.EmailMd5).ToUpper());
+            Assert.AreEqual(fact.DomainId, subscriber.DomainId);
+            Assert.AreEqual(1000, subscriber.FamilyDomainId);
         }
 
         [TestMethod]
-        public void AddSubscriber_Email_5_ChangeContacts_Test()
+        public void AddSubscriber_Email_D_ChangeContacts_Test()
         {
             var result = ChangeContacts(MatchBy.Email, emailMd5: ExistMd5, email: NotExistEmail);
 
@@ -1205,6 +1506,14 @@ namespace Multi.WebDaoTests.TestsLib
 
                 Assert.AreEqual(ChannelType.Email, fact.ChannelTypeId);
             }
+
+            var subscriber = LoadSubscriber(result.Item1.SubscriberId);
+            Assert.IsNotNull(subscriber);
+
+            Assert.AreEqual(NotExistEmail, subscriber.Email);
+            Assert.AreEqual(NotExistMd5, CryptographyHelper.BytesToHexString(subscriber.EmailMd5).ToUpper());
+            Assert.AreEqual(fact.DomainId, subscriber.DomainId);
+            Assert.AreEqual(1000, subscriber.FamilyDomainId);
         }
 
         [TestMethod]
@@ -1234,9 +1543,15 @@ namespace Multi.WebDaoTests.TestsLib
             }
 
             var subscriber = LoadSubscriber(result.Item1.SubscriberId);
-            Assert.IsNotNull(subscriber);
+
             Assert.AreEqual(NotExistEmail, subscriber.Email);
+            Assert.AreEqual(NotExistMd5, CryptographyHelper.BytesToHexString(subscriber.EmailMd5).ToUpper());
+            Assert.AreEqual(3, subscriber.DomainId);
+            Assert.AreEqual(1000, subscriber.FamilyDomainId);
+
             Assert.AreEqual(NotExistPhone, subscriber.Phone);
+            Assert.IsTrue(NotExistPhone.EndsWith(subscriber.PhoneLocal));
+            Assert.IsTrue(NotExistPhone.StartsWith(subscriber.DialingPrefix));
         }
 
         private Tuple<AddSubscriberResult, FactSubscription[]> ChangeContacts(MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
@@ -1254,8 +1569,8 @@ namespace Multi.WebDaoTests.TestsLib
                         emailMd5: emailMd5,
                         phone: phone,
                         customSubscriberId: customSubscriberId,
-                        firstName: "Jan",
-                        lastName: "Kowalski",
+                        firstName: SubscriberFirstname,
+                        lastName: SubscriberLastname,
                         trackingCode: null,
                         vendor: null,
                         ip: SubscriberIp,
@@ -1312,8 +1627,13 @@ namespace Multi.WebDaoTests.TestsLib
 
             var subscriber = LoadSubscriber(result.Item1.SubscriberId);
             Assert.IsNotNull(subscriber);
+
             Assert.AreEqual(ExistEmail, subscriber.Email);
-            Assert.AreEqual("Jan", subscriber.Firstname);
+            Assert.AreEqual(ExistMd5, CryptographyHelper.BytesToHexString(subscriber.EmailMd5).ToUpper());
+            Assert.AreEqual(fact.DomainId, subscriber.DomainId);
+            Assert.AreEqual(1000, subscriber.FamilyDomainId);
+
+            Assert.AreEqual(SubscriberFirstname, subscriber.Firstname);
             Assert.AreEqual("Nowacki", subscriber.Lastname);
         }
 
@@ -1339,7 +1659,12 @@ namespace Multi.WebDaoTests.TestsLib
 
             var subscriber = LoadSubscriber(result.Item1.SubscriberId);
             Assert.IsNotNull(subscriber);
+
             Assert.AreEqual(ExistEmail, subscriber.Email);
+            Assert.AreEqual(ExistMd5, CryptographyHelper.BytesToHexString(subscriber.EmailMd5).ToUpper());
+            Assert.AreEqual(fact.DomainId, subscriber.DomainId);
+            Assert.AreEqual(1000, subscriber.FamilyDomainId);
+
             Assert.IsNull(subscriber.Firstname);
             Assert.AreEqual("Nowacki", subscriber.Lastname);
         }
@@ -1525,8 +1850,13 @@ namespace Multi.WebDaoTests.TestsLib
                 Email = s.Email,
                 EmailMd5 = s.EmailMd5,
                 Phone = s.Phone,
+                PhoneLocal = s.PhoneLocal,
+                DialingPrefix = s.DialingPrefix,
                 Firstname = s.Firstname,
-                Lastname = s.Lastname
+                Lastname = s.Lastname,
+                Ip = s.Ip,
+                DomainId = s.Domain.Id,
+                FamilyDomainId = s.Domain.Family.Id
                 
             }, s => s.Id == subscriberId).FirstOrDefault();
             return subscribedOne;
@@ -1535,11 +1865,16 @@ namespace Multi.WebDaoTests.TestsLib
         private class SubscribedOne
         {
             public int Id { get; set; }
+            public string Ip { get; set; }
             public string Email { get; set; }
             public byte[] EmailMd5 { get; set; }
             public string Phone { get; set; }
+            public string PhoneLocal { get; set; }
+            public string DialingPrefix { get; set; }
             public string Firstname { get; set; }
             public string Lastname { get; set; }
+            public int? DomainId { get; set; }
+            public int? FamilyDomainId { get; set; }
         }
         #endregion
     }
