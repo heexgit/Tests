@@ -4,11 +4,11 @@ using ExpertSender.Common.QueryBuilder;
 using ExpertSender.DataModel.Dao;
 using ExpertSender.DataModel.Dao.Statistics;
 using ExpertSender.DataModel.Enums;
-using NHibernate;
 using Multi.WebDaoTests.Core;
+using NHibernate;
 using EsAppContext = Multi.WebDaoTests.Mocks.EsAppContext;
 
-namespace Multi.WebDaoTests.TestsDao
+namespace Multi.WebDaoTests.DaoTests
 {
     internal class SubscriberDaoTests : Tester
     {

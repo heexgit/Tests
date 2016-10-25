@@ -617,6 +617,10 @@ namespace Multi.WebDaoTests.TestsLib
             Assert.AreEqual(ExistMd5, CryptographyHelper.BytesToHexString(subscriber.EmailMd5).ToUpper());
             Assert.AreEqual(fact.DomainId, subscriber.DomainId);
             Assert.AreEqual(1000, subscriber.FamilyDomainId);
+            
+            Assert.AreEqual(ExistPhone, subscriber.Phone);
+            Assert.IsTrue(ExistPhone.EndsWith(subscriber.PhoneLocal));
+            Assert.IsTrue(ExistPhone.StartsWith(subscriber.DialingPrefix));
         }
 
         [TestMethod]
@@ -641,6 +645,10 @@ namespace Multi.WebDaoTests.TestsLib
             Assert.AreEqual(ExistMd5, CryptographyHelper.BytesToHexString(subscriber.EmailMd5).ToUpper());
             Assert.AreEqual(fact.DomainId, subscriber.DomainId);
             Assert.AreEqual(1000, subscriber.FamilyDomainId);
+
+            Assert.AreEqual(ExistPhone, subscriber.Phone);
+            Assert.IsTrue(ExistPhone.EndsWith(subscriber.PhoneLocal));
+            Assert.IsTrue(ExistPhone.StartsWith(subscriber.DialingPrefix));
         }
 
         [TestMethod]
@@ -651,7 +659,7 @@ namespace Multi.WebDaoTests.TestsLib
             var fact = result.Item2;
             if (fact != null)
             {
-                Assert.AreEqual(null, fact.DomainId);
+                Assert.IsNull(fact.DomainId);
                 Assert.AreEqual(SubscriberIp, fact.ClientIp);
                 Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
 
@@ -664,6 +672,11 @@ namespace Multi.WebDaoTests.TestsLib
             Assert.AreEqual(ExistPhone, subscriber.Phone);
             Assert.IsTrue(ExistPhone.EndsWith(subscriber.PhoneLocal));
             Assert.IsTrue(ExistPhone.StartsWith(subscriber.DialingPrefix));
+
+            Assert.AreEqual(ExistEmail, subscriber.Email);
+            Assert.AreEqual(ExistMd5, CryptographyHelper.BytesToHexString(subscriber.EmailMd5).ToUpper());
+            Assert.AreEqual(3, subscriber.DomainId);
+            Assert.AreEqual(1000, subscriber.FamilyDomainId);
         }
 
         private Tuple<AddSubscriberResult, FactSubscription> WasAddedToList(MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
@@ -869,7 +882,7 @@ namespace Multi.WebDaoTests.TestsLib
             var fact = result.Item2;
             if (fact != null)
             {
-                Assert.AreEqual(null, fact.DomainId);
+                Assert.IsNull(fact.DomainId);
                 Assert.AreEqual(SubscriberIp, fact.ClientIp);
                 Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
 
@@ -1040,7 +1053,7 @@ namespace Multi.WebDaoTests.TestsLib
             var fact = result.Item2.SingleOrDefault();
             if (fact != null)
             {
-                Assert.AreEqual(null, fact.DomainId);
+                Assert.IsNull(fact.DomainId);
                 Assert.AreEqual(SubscriberIp, fact.ClientIp);
                 Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
 
@@ -1067,7 +1080,7 @@ namespace Multi.WebDaoTests.TestsLib
             var fact = result.Item2.SingleOrDefault();
             if (fact != null)
             {
-                Assert.AreEqual(null, fact.DomainId);
+                Assert.IsNull(fact.DomainId);
                 Assert.AreEqual(SubscriberIp, fact.ClientIp);
                 Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
 
@@ -1098,7 +1111,7 @@ namespace Multi.WebDaoTests.TestsLib
             var fact = result.Item2.SingleOrDefault();
             if (fact != null)
             {
-                Assert.AreEqual(null, fact.DomainId);
+                Assert.IsNull(fact.DomainId);
                 Assert.AreEqual(SubscriberIp, fact.ClientIp);
                 Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
 
@@ -1129,7 +1142,7 @@ namespace Multi.WebDaoTests.TestsLib
             var fact = result.Item2.SingleOrDefault();
             if (fact != null)
             {
-                Assert.AreEqual(null, fact.DomainId);
+                Assert.IsNull(fact.DomainId);
                 Assert.AreEqual(SubscriberIp, fact.ClientIp);
                 Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
 
@@ -1171,7 +1184,7 @@ namespace Multi.WebDaoTests.TestsLib
             fact = facts.FirstOrDefault(f => f.ChannelTypeId == ChannelType.SmsMms);
             if (fact != null)
             {
-                Assert.AreEqual(null, fact.DomainId);
+                Assert.IsNull(fact.DomainId);
                 Assert.AreEqual(SubscriberIp, fact.ClientIp);
                 Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
             }
@@ -1245,18 +1258,68 @@ namespace Multi.WebDaoTests.TestsLib
         #region ReplaceSubscriber
 
         [TestMethod]
-        public void AddSubscriber_Email_ReplaceSubscriber_Test()
+        public void AddSubscriber_Email_E_ReplaceSubscriber_Test()
         {
-            var result = ReplaceSubscriber(MatchBy.Email, email: ExistEmail);
+            var result = ReplaceSubscriber(
+                MatchBy.Email,
+                email: ExistEmail
+            );
+
+            var fact = result.Item2;
+            if (fact != null)
+            {
+                Assert.AreEqual(3, fact.DomainId);
+                Assert.AreEqual(SubscriberIp, fact.ClientIp);
+                Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
+
+                Assert.AreEqual(ChannelType.Email, fact.ChannelTypeId);
+            }
+            
+            var subscriber = LoadSubscriber(result.Item1.SubscriberId);
+            Assert.IsNotNull(subscriber);
+
+            Assert.AreEqual(ExistEmail, subscriber.Email);
+            Assert.AreEqual(ExistMd5, CryptographyHelper.BytesToHexString(subscriber.EmailMd5).ToUpper());
+            Assert.AreEqual(fact.DomainId, subscriber.DomainId);
+            Assert.AreEqual(1000, subscriber.FamilyDomainId);
+            
+            Assert.IsNull(subscriber.Phone);
+            Assert.IsNull(subscriber.PhoneLocal);
+            Assert.IsNull(subscriber.DialingPrefix);
         }
 
         [TestMethod]
-        public void AddSubscriber_Phone_ReplaceSubscriber_Test()
+        public void AddSubscriber_Phone_P_ReplaceSubscriber_Test()
         {
-            var result = ReplaceSubscriber(MatchBy.Phone, phone: ExistPhone);
+            var result = ReplaceSubscriber(
+                MatchBy.Phone,
+                phone: ExistPhone
+            );
+
+            var fact = result.Item2;
+            if (fact != null)
+            {
+                Assert.IsNull(fact.DomainId);
+                Assert.AreEqual(SubscriberIp, fact.ClientIp);
+                Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
+
+                Assert.AreEqual(ChannelType.SmsMms, fact.ChannelTypeId);
+            }
+            
+            var subscriber = LoadSubscriber(result.Item1.SubscriberId);
+            Assert.IsNotNull(subscriber);
+
+            Assert.IsNull(subscriber.Email);
+            Assert.IsNull(subscriber.EmailMd5);
+            Assert.IsNull(subscriber.DomainId);
+            Assert.IsNull(subscriber.FamilyDomainId);
+
+            Assert.AreEqual(ExistPhone, subscriber.Phone);
+            Assert.IsTrue(ExistPhone.EndsWith(subscriber.PhoneLocal));
+            Assert.IsTrue(ExistPhone.StartsWith(subscriber.DialingPrefix));
         }
 
-        private AddSubscriberResult ReplaceSubscriber(MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
+        private Tuple<AddSubscriberResult, FactSubscription> ReplaceSubscriber(MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
         {
             AddSubscriberResult result = null;
             FactSubscription fact = null;
@@ -1265,7 +1328,7 @@ namespace Multi.WebDaoTests.TestsLib
             {
                 result = SM_AddAndReplace(matchBy)
                     .AddSubscriber(
-                        ActiveSubscribedListId,
+                        ActiveNotSubscribedListId,
                         id: subscriberId,
                         email: email,
                         emailMd5: emailMd5,
@@ -1287,46 +1350,17 @@ namespace Multi.WebDaoTests.TestsLib
                 fact = LoadSubscriptions(result.SubscriberId, result.ListId).FirstOrDefault();
             }
             catch (SubscriberManagerException ex)
-            {
-                //if (ifErrorConditition == null)
-                //{
-                //    ifErrorConditition = exx =>
-                //        exx.PropertiesErrors.SingleOrDefault(e => e.Key == RequiredPropertyInt).Value.Contains(string.Format(Resources.SubscriberManager.InvalidValue, "cecha liczbowa xx3"));
-                //}
+            { }
 
-                //if (ifErrorConditition(ex))
-                //    throw ex;
-            }
-            
             Assert.IsNotNull(result);
             if (result != null)
             {
-                Assert.AreEqual(true, result.WasAlreadyOnList);
+                Assert.AreEqual(true, result.WasAddedToList);
             }
 
             Assert.IsNotNull(fact);
-            if (fact != null)
-            {
-                Assert.AreEqual(3, fact.DomainId);
-                Assert.AreEqual(SubscriberIp, fact.ClientIp);
-                Assert.AreEqual(ChannelType.Email, fact.ChannelTypeId);
 
-                Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
-            }
-
-            var subscriber = LoadSubscriber(result.SubscriberId);
-            Assert.IsNotNull(subscriber);
-
-            Assert.AreEqual(ExistEmail, subscriber.Email);
-            Assert.AreEqual(ExistMd5, CryptographyHelper.BytesToHexString(subscriber.EmailMd5).ToUpper());
-            Assert.AreEqual(fact.DomainId, subscriber.DomainId);
-            Assert.AreEqual(1000, subscriber.FamilyDomainId);
-
-            Assert.AreEqual(ExistPhone, subscriber.Phone);
-            Assert.IsTrue(ExistPhone.EndsWith(subscriber.PhoneLocal));
-            Assert.IsTrue(ExistPhone.StartsWith(subscriber.DialingPrefix));
-
-            return result;
+            return new Tuple<AddSubscriberResult, FactSubscription>(result, fact);
         }
         #endregion
 
@@ -1537,7 +1571,7 @@ namespace Multi.WebDaoTests.TestsLib
             fact = facts.FirstOrDefault(f => f.ChannelTypeId == ChannelType.SmsMms);
             if (fact != null)
             {
-                Assert.AreEqual(null, fact.DomainId);
+                Assert.IsNull(fact.DomainId);
                 Assert.AreEqual(SubscriberIp, fact.ClientIp);
                 Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
             }

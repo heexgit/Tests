@@ -43,6 +43,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpertSender.Lib", "..\..\v
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Multi.WebDaoTests", "Multi.WebDaoTests\Multi.WebDaoTests.csproj", "{5B76CEF2-06A7-4F56-AD28-203C502904C8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpertSender.Backend.Host", "..\..\vso\ExpertSender 2 MultiChannel\Dev\Src\ExpertSender.Backend.Host\ExpertSender.Backend.Host.csproj", "{EE1C3AAC-F15E-473F-AC57-3C1BE095976B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -121,6 +123,10 @@ Global
 		{5B76CEF2-06A7-4F56-AD28-203C502904C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5B76CEF2-06A7-4F56-AD28-203C502904C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5B76CEF2-06A7-4F56-AD28-203C502904C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EE1C3AAC-F15E-473F-AC57-3C1BE095976B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE1C3AAC-F15E-473F-AC57-3C1BE095976B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE1C3AAC-F15E-473F-AC57-3C1BE095976B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE1C3AAC-F15E-473F-AC57-3C1BE095976B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -138,5 +144,6 @@ Global
 		{150602E1-6EFA-42EF-BC41-B912A82F48C5} = {D600CA32-78F3-4A47-8E21-289245784E11}
 		{9F7B8E72-CF1B-4724-A631-5AF91902EBBB} = {D600CA32-78F3-4A47-8E21-289245784E11}
 		{AEA663D6-55D8-4331-AA3E-705D9A26CA57} = {D600CA32-78F3-4A47-8E21-289245784E11}
+		{EE1C3AAC-F15E-473F-AC57-3C1BE095976B} = {D600CA32-78F3-4A47-8E21-289245784E11}
 	EndGlobalSection
 EndGlobal

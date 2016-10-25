@@ -6,11 +6,11 @@ using ExpertSender.Common.Dao;
 using ExpertSender.DataModel;
 using ExpertSender.DataModel.Dao;
 using ExpertSender.DataModel.SmsMms;
-using NHibernate;
 using Multi.WebDaoTests.Core;
+using NHibernate;
 using EsAppContext = Multi.WebDaoTests.Mocks.EsAppContext;
 
-namespace Multi.WebDaoTests.TestsDao
+namespace Multi.WebDaoTests.DaoTests
 {
     internal class AnyQueryTests : Tester
     {

@@ -2,7 +2,7 @@
 using Multi.WebDaoTests.Core;
 using EsAppContext = Multi.WebDaoTests.Mocks.EsAppContext;
 
-namespace Multi.WebDaoTests.TestsDao
+namespace Multi.WebDaoTests.DaoTests
 {
     internal class FactExtendedPropertiesDaoTests : Tester
     {

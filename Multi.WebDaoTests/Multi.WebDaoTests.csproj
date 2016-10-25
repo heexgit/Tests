@@ -64,6 +64,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -74,17 +75,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\InfrastructureRegistry.cs" />
+    <Compile Include="TestsLib\MachineConfigTests.cs" />
     <Compile Include="Mocks\EsAppContext.mock.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\Tester.base.cs" />
-    <Compile Include="TestsDao\FactExtendedPropertiesDaoTests.cs" />
-    <Compile Include="TestsDao\MessageContentDaoTests.cs" />
-    <Compile Include="TestsDao\AnyQueryTests.cs" />
-    <Compile Include="TestsDao\SubscriberDaoTests.cs" />
-    <Compile Include="TestsDao\DomainDaoTests.cs" />
-    <Compile Include="TestsDao\TagDaoTests.cs" />
-    <Compile Include="TestsDao\UserDaoTests.cs" />
+    <Compile Include="DaoTests\FactExtendedPropertiesDaoTests.cs" />
+    <Compile Include="DaoTests\MessageContentDaoTests.cs" />
+    <Compile Include="DaoTests\AnyQueryTests.cs" />
+    <Compile Include="DaoTests\SubscriberDaoTests.cs" />
+    <Compile Include="DaoTests\DomainDaoTests.cs" />
+    <Compile Include="DaoTests\TagDaoTests.cs" />
+    <Compile Include="DaoTests\UserDaoTests.cs" />
     <Compile Include="TestsLib\SubscriberManagerTests.cs" />
   </ItemGroup>
   <ItemGroup>
