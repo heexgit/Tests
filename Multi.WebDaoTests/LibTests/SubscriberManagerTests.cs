@@ -8,14 +8,15 @@ using ExpertSender.DataModel.Dao.Statistics;
 using ExpertSender.DataModel.Enums;
 using ExpertSender.Lib.SubscriberManager;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NHibernate;
 using Multi.WebDaoTests.Core;
+using NHibernate;
 using EsAppContext = Multi.WebDaoTests.Mocks.EsAppContext;
 using Resources = ExpertSender.Lib.SubscriberManager.Resources;
+using SubscriberManager = ExpertSender.Lib.SubscriberManager.SubscriberManager;
 
 // ReSharper disable UnusedVariable, PossibleIntendedRethrow
 
-namespace Multi.WebDaoTests.TestsLib
+namespace Multi.WebDaoTests.LibTests
 {
     [TestClass]
     public class SubscriberManagerTests : Tester, IDisposable

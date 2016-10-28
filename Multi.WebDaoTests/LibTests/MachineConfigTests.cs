@@ -6,7 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Multi.WebDaoTests.Core;
 using EsAppContext = Multi.WebDaoTests.Mocks.EsAppContext;
 
-namespace Multi.WebDaoTests.TestsLib
+namespace Multi.WebDaoTests.LibTests
 {
     [TestClass]
     public class MachineConfigTests : Tester

@@ -1,5 +1,4 @@
 ﻿using Multi.WebDaoTests.DaoTests;
-using Multi.WebDaoTests.TestsLib;
 
 namespace Multi.WebDaoTests
 {

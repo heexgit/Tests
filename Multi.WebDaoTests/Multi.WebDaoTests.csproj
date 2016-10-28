@@ -75,7 +75,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\InfrastructureRegistry.cs" />
-    <Compile Include="TestsLib\MachineConfigTests.cs" />
+    <Compile Include="DataModelTests\MessageClonerTests.cs" />
+    <Compile Include="LibTests\MachineConfigTests.cs" />
     <Compile Include="Mocks\EsAppContext.mock.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -87,7 +88,7 @@
     <Compile Include="DaoTests\DomainDaoTests.cs" />
     <Compile Include="DaoTests\TagDaoTests.cs" />
     <Compile Include="DaoTests\UserDaoTests.cs" />
-    <Compile Include="TestsLib\SubscriberManagerTests.cs" />
+    <Compile Include="LibTests\SubscriberManagerTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
