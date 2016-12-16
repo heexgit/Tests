@@ -6,6 +6,7 @@ using ExpertSender.Common.QueryBuilder;
 using ExpertSender.DataModel.Dao;
 using ExpertSender.DataModel.Dao.Statistics;
 using ExpertSender.DataModel.Enums;
+using ExpertSender.Lib;
 using ExpertSender.Lib.SubscriberManager;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Multi.WebDaoTests.Core;
@@ -1393,20 +1394,23 @@ namespace Multi.WebDaoTests.LibTests
                         subscriberId: subscriberId,
                         messageGuid: messageGuid,
                         listId: listId,
-                        unitId: CurrentUnitId,
+                        serviceId: CurrentUnitId,
                         reason: UnsubscribeReason.Api,
                         channelType: channelType,
-                        browser: null,
-                        browserVersion: null,
-                        device: null,
-                        deviceVersion: null,
-                        environment: null,
-                        environmentVersion: null,
-                        renderingEngine: null,
-                        renderingEngineVersion: null,
-                        isMobile: false,
-                        clientLanguage: null,
-                        clientEmailDomain: null
+                        subscriberRequestInformation: new SubscriberRequestInformation
+                        {
+                            Browser = null,
+                            BrowserVersion = null,
+                            Device = null,
+                            DeviceVersion = null,
+                            Environment = null,
+                            EnvironmentVersion = null,
+                            RenderEngine = null,
+                            RenderingEngineVersion = null,
+                            IsMobile = false,
+                            ClientLanguage = null,
+                            ClientEmailDomain = null
+                        }
                     );
             }
             catch (SubscriberManagerException ex)
@@ -1452,20 +1456,23 @@ namespace Multi.WebDaoTests.LibTests
                        subscriberId: subscriberId,
                         messageGuid: messageGuid,
                         listId: listId,
-                        unitId: CurrentUnitId,
+                        serviceId: CurrentUnitId,
                         reason: UnsubscribeReason.Api,
                         channelType: channelType,
-                        browser: null,
-                        browserVersion: null,
-                        device: null,
-                        deviceVersion: null,
-                        environment: null,
-                        environmentVersion: null,
-                        renderingEngine: null,
-                        renderingEngineVersion: null,
-                        isMobile: false,
-                        clientLanguage: null,
-                        clientEmailDomain: null
+                        subscriberRequestInformation: new SubscriberRequestInformation
+                        {
+                            Browser = null,
+                            BrowserVersion = null,
+                            Device = null,
+                            DeviceVersion = null,
+                            Environment = null,
+                            EnvironmentVersion = null,
+                            RenderEngine = null,
+                            RenderingEngineVersion = null,
+                            IsMobile = false,
+                            ClientLanguage = null,
+                            ClientEmailDomain = null
+                        }
                     );
             }
             catch (SubscriberManagerException ex)

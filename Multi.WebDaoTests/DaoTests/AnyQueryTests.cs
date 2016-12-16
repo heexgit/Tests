@@ -3,6 +3,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using ExpertSender.Common.Dao;
+using ExpertSender.Common.QueryBuilder;
 using ExpertSender.DataModel;
 using ExpertSender.DataModel.Dao;
 using ExpertSender.DataModel.SmsMms;
@@ -26,8 +27,11 @@ namespace Multi.WebDaoTests.DaoTests
             //LoadListSettingDictionary();
             //LoadSubscribedOn();
             //ChangeSubscribedOn();
-            LoadSmsMmsShipment();
-            LoadSmsMmsShipmentTarget();
+            //LoadSmsMmsShipment();
+            //LoadSmsMmsShipmentTarget();
+            ChangeNoTag();
+            ChangeTag();
+            ChangeMessageContents();
         }
 
         private void LoadSmsMmsShipment()
@@ -148,6 +152,60 @@ namespace Multi.WebDaoTests.DaoTests
 
             var ses = Container.GetInstance<ISession>();
             ses.Flush();
+        }
+
+        private void ChangeNoTag()
+        {
+            var dao = Container.GetInstance<IWebDao<Tag>>();
+
+            using (var tran = Container.GetInstance<ISession>().BeginTransaction())
+            {
+                try
+                {
+                    var affected = dao.Update(new SetBuilder(new {Name = "takTak"}), new WhereBuilder(new {Id = 0}));
+                }
+                finally
+                {
+                    // przywracamy zmienione obiekty do poprzedniego stanu
+                    tran.Rollback();
+                }
+            }
+        }
+
+        private void ChangeTag()
+        {
+            var dao = Container.GetInstance<IWebDao<Tag>>();
+
+            using (var tran = Container.GetInstance<ISession>().BeginTransaction())
+            {
+                try
+                {
+                    var affected = dao.Update(new SetBuilder(new {Name = "takTak"}), new WhereBuilder(new {Id = 1}));
+                }
+                finally
+                {
+                    // przywracamy zmienione obiekty do poprzedniego stanu
+                    tran.Rollback();
+                }
+            }
+        }
+
+        private void ChangeMessageContents()
+        {
+            var dao = Container.GetInstance<IWebDao<MessageContent>>();
+
+            using (var tran = Container.GetInstance<ISession>().BeginTransaction())
+            {
+                try
+                {
+                    var affected = dao.Update(new SetBuilder(new {Subject = "takTak"}), new WhereBuilder().Where("Id < {0}", new { Id = 10 }));
+                }
+                finally
+                {
+                    // przywracamy zmienione obiekty do poprzedniego stanu
+                    tran.Rollback();
+                }
+            }
         }
     }
 }
