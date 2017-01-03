@@ -1406,7 +1406,6 @@ namespace Multi.WebDaoTests.LibTests
                             Environment = null,
                             EnvironmentVersion = null,
                             RenderEngine = null,
-                            RenderingEngineVersion = null,
                             IsMobile = false,
                             ClientLanguage = null,
                             ClientEmailDomain = null
@@ -1468,7 +1467,6 @@ namespace Multi.WebDaoTests.LibTests
                             Environment = null,
                             EnvironmentVersion = null,
                             RenderEngine = null,
-                            RenderingEngineVersion = null,
                             IsMobile = false,
                             ClientLanguage = null,
                             ClientEmailDomain = null

@@ -76,6 +76,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\InfrastructureRegistry.cs" />
+    <Compile Include="DaoTests\StructureMapTests.cs" />
     <Compile Include="DataModelTests\MessageClonerTests.cs" />
     <Compile Include="LibTests\MachineConfigTests.cs" />
     <Compile Include="Mocks\EsAppContext.mock.cs" />

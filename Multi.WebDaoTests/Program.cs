@@ -6,8 +6,9 @@ namespace Multi.WebDaoTests
     {
         private static void Main()
         {
-            new AnyQueryTests().Start();
+            //new AnyQueryTests().Start();
             //new SubscriberDaoTests().Start();
+            new StructureMapTests().Start();
             //new UserDaoTests().Start();
             //new MessageContentDaoTests().Start();
             //new FactExtendedPropertiesDaoTests().Start();
