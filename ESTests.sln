@@ -5,7 +5,7 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebDaoTests", "WebDaoTests\WebDaoTests.csproj", "{8A0E89AD-11EE-4452-B214-31F07E553BC1}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExpertSender", "ExpertSender", "{A637231F-B229-4838-B384-B891840B577D}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dev.ExpertSender", "Dev.ExpertSender", "{A637231F-B229-4838-B384-B891840B577D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpertSender.Common", "..\..\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.Common\ExpertSender.Common.csproj", "{58CC1440-50B4-41C8-98F4-D259250FC53E}"
 EndProject

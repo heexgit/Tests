@@ -17,7 +17,7 @@ using SubscriberManager = ExpertSender.Lib.SubscriberManager.SubscriberManager;
 
 // ReSharper disable UnusedVariable, PossibleIntendedRethrow
 
-namespace Multi.WebDaoTests.LibTests
+namespace WebDaoTests.LibTests
 {
     [TestClass]
     public class SubscriberManagerTests : Tester, IDisposable
@@ -92,51 +92,51 @@ namespace Multi.WebDaoTests.LibTests
         [ExpectedException(typeof(SubscriberManagerException))]
         public void AddSubscriber_Email_E_ListDoesNotBelongToService_Test()
         {
-            ListDoesNotBelongToService(MatchBy.Email, email: ExistEmail);
+            ListDoesNotBelongToService(ChannelType.SmsMms, MatchBy.Email, email: ExistEmail);
         }
 
         [TestMethod]
         [ExpectedException(typeof(SubscriberManagerException))]
         public void AddSubscriber_Phone_P_ListDoesNotBelongToService_Test()
         {
-            ListDoesNotBelongToService(MatchBy.Phone, phone: ExistPhone);
+            ListDoesNotBelongToService(ChannelType.SmsMms, MatchBy.Phone, phone: ExistPhone);
         }
 
         [TestMethod]
         [ExpectedException(typeof(SubscriberManagerException))]
         public void AddSubscriber_Email_EP_ListDoesNotBelongToService_Test()
         {
-            ListDoesNotBelongToService(MatchBy.Email, email: ExistEmail, phone: ExistPhone);
+            ListDoesNotBelongToService(ChannelType.SmsMms, MatchBy.Email, email: ExistEmail, phone: ExistPhone);
         }
 
         [TestMethod]
         [ExpectedException(typeof(SubscriberManagerException))]
         public void AddSubscriber_Phone_EP_ListDoesNotBelongToService_Test()
         {
-            ListDoesNotBelongToService(MatchBy.Phone, email: ExistEmail, phone: ExistPhone);
+            ListDoesNotBelongToService(ChannelType.SmsMms, MatchBy.Phone, email: ExistEmail, phone: ExistPhone);
         }
 
         [TestMethod]
         [ExpectedException(typeof(SubscriberManagerException))]
         public void AddSubscriber_Email_EPD_ListDoesNotBelongToService_Test()
         {
-            ListDoesNotBelongToService(MatchBy.Email, email: ExistEmail, phone: ExistPhone, emailMd5: ExistMd5);
+            ListDoesNotBelongToService(ChannelType.SmsMms, MatchBy.Email, email: ExistEmail, phone: ExistPhone, emailMd5: ExistMd5);
         }
 
         [TestMethod]
         [ExpectedException(typeof(SubscriberManagerException))]
         public void AddSubscriber_Phone_EPD_ListDoesNotBelongToService_Test()
         {
-            ListDoesNotBelongToService(MatchBy.Phone, email: ExistEmail, phone: ExistPhone, emailMd5: ExistMd5);
+            ListDoesNotBelongToService(ChannelType.SmsMms, MatchBy.Phone, email: ExistEmail, phone: ExistPhone, emailMd5: ExistMd5);
         }
 
-        private AddSubscriberResult ListDoesNotBelongToService(MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null)
+        private AddSubscriberResult ListDoesNotBelongToService(ChannelType channelType, MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null)
         {
             AddSubscriberResult result = null;
 
             try
             {
-                result = SM_AddAndIgnore(matchBy)
+                result = SM_AddAndIgnore(channelType, matchBy)
                     .AddSubscriber(
                         DeletedListId,
                         id: subscriberId,
@@ -173,21 +173,21 @@ namespace Multi.WebDaoTests.LibTests
         [ExpectedException(typeof(SubscriberManagerException))]
         public void AddSubscriber_Email_E_FieldIsRequired_Test()
         {
-            FieldIsRequired(MatchBy.Email, email: NotExistEmail);
+            FieldIsRequired(ChannelType.SmsMms, MatchBy.Email, email: NotExistEmail);
         }
 
         [TestMethod]
         [ExpectedException(typeof(SubscriberManagerException))]
         public void AddSubscriber_Phone_P_FieldIsRequired_Test()
         {
-            FieldIsRequired(MatchBy.Phone, phone: NotExistPhone);
+            FieldIsRequired(ChannelType.SmsMms, MatchBy.Phone, phone: NotExistPhone);
         }
 
         [TestMethod]
         [ExpectedException(typeof(SubscriberManagerException))]
         public void AddSubscriber_Email_EP_FieldIsRequired_Test()
         {
-            FieldIsRequired(MatchBy.Email, email: NotExistEmail, phone: NotExistPhone);
+            FieldIsRequired(ChannelType.SmsMms, MatchBy.Email, email: NotExistEmail, phone: NotExistPhone);
         }
 
         [TestMethod]
@@ -195,6 +195,7 @@ namespace Multi.WebDaoTests.LibTests
         public void AddSubscriber_Phone_EP_FieldIsRequired_Test()
         {
             FieldIsRequired(
+                ChannelType.SmsMms,
                 MatchBy.Phone,
                 email: NotExistEmail,
                 phone: NotExistPhone
@@ -206,6 +207,7 @@ namespace Multi.WebDaoTests.LibTests
         public void AddSubscriber_Email_PD_FieldIsRequired_Test()
         {
             FieldIsRequired(
+                ChannelType.SmsMms,
                 MatchBy.Email,
                 phone: NotExistPhone,
                 emailMd5: NotExistMd5,
@@ -218,6 +220,7 @@ namespace Multi.WebDaoTests.LibTests
         public void AddSubscriber_Phone_ED_FieldIsRequired_Test()
         {
             FieldIsRequired(
+                ChannelType.SmsMms,
                 MatchBy.Phone,
                 email: NotExistEmail,
                 emailMd5: NotExistMd5,
@@ -230,6 +233,7 @@ namespace Multi.WebDaoTests.LibTests
         public void AddSubscriber_Custom_EP_FieldIsRequired_Test()
         {
             var result = FieldIsRequired(
+                ChannelType.SmsMms,
                 MatchBy.CustomSubscriberId,
                 email: NotExistEmail,
                 phone: NotExistPhone,
@@ -242,6 +246,7 @@ namespace Multi.WebDaoTests.LibTests
         public void AddSubscriber_Custom_NoData_FieldIsRequired_Test()
         {
             var result = FieldIsRequired(
+                ChannelType.SmsMms,
                 MatchBy.CustomSubscriberId,
                 ifErrorConditition: ex =>
                     ex.FieldsErrors.SingleOrDefault(e => e.Key == "customSubscriberId").Value.Contains(Resources.SubscriberManager.CustomSubscriberIdIsInvalid)
@@ -255,6 +260,7 @@ namespace Multi.WebDaoTests.LibTests
         public void AddSubscriber_Custom_NoContacts_FieldIsRequired_Test()
         {
             var result = FieldIsRequired(
+                ChannelType.SmsMms,
                 MatchBy.CustomSubscriberId,
                 customSubscriberId: ExistCustomSubscriberId,
                 ifErrorConditition: ex =>
@@ -268,6 +274,7 @@ namespace Multi.WebDaoTests.LibTests
         public void AddSubscriber_Id_E_FieldIsRequired_Test()
         {
             var result = FieldIsRequired(
+                ChannelType.SmsMms,
                 MatchBy.Id,
                 email: NotExistEmail,
                 ifErrorConditition: ex => ex.FieldsErrors.SingleOrDefault(e => e.Key == "subscriberId").Value.Contains(Resources.SubscriberManager.IdIsInvalid)
@@ -279,6 +286,7 @@ namespace Multi.WebDaoTests.LibTests
         public void AddSubscriber_Id_EP_FieldIsRequired_Test()
         {
             var result = FieldIsRequired(
+                ChannelType.SmsMms,
                 MatchBy.Id,
                 email: NotExistEmail,
                 phone: NotExistPhone,
@@ -291,6 +299,7 @@ namespace Multi.WebDaoTests.LibTests
         public void AddSubscriber_Id_NoData_FieldIsRequired_Test()
         {
             var result = FieldIsRequired(
+                ChannelType.SmsMms,
                 MatchBy.Id,
                 ifErrorConditition: ex =>
                     ex.FieldsErrors.SingleOrDefault(e => e.Key == "subscriberId").Value.Contains(Resources.SubscriberManager.IdIsInvalid)
@@ -304,6 +313,7 @@ namespace Multi.WebDaoTests.LibTests
         public void AddSubscriber_Id_NoContacts_FieldIsRequired_Test()
         {
             var result = FieldIsRequired(
+                ChannelType.SmsMms,
                 MatchBy.Id,
                 subscriberId: ExistSubscriberId,
                 ifErrorConditition: ex =>
@@ -317,6 +327,7 @@ namespace Multi.WebDaoTests.LibTests
         public void AddSubscriber_Email_EPx_FieldIsRequired_Test()
         {
             var result = FieldIsRequired(
+                ChannelType.SmsMms,
                 MatchBy.Email, 
                 email: NotExistEmail,
                 phone: "xxx",
@@ -330,6 +341,7 @@ namespace Multi.WebDaoTests.LibTests
         public void AddSubscriber_Email_EP000_FieldIsRequired_Test()
         {
             var result = FieldIsRequired(
+                ChannelType.SmsMms,
                 MatchBy.Email, 
                 email: NotExistEmail,
                 phone: "123456789013467901346790",
@@ -343,6 +355,7 @@ namespace Multi.WebDaoTests.LibTests
         public void AddSubscriber_Phone_ExP_FieldIsRequired_Test()
         {
             var result = FieldIsRequired(
+                ChannelType.SmsMms,
                 MatchBy.Phone,
                 email: "xxx",
                 phone: NotExistPhone,
@@ -356,6 +369,7 @@ namespace Multi.WebDaoTests.LibTests
         public void AddSubscriber_Phone_E000P_FieldIsRequired_Test()
         {
             var result = FieldIsRequired(
+                ChannelType.SmsMms,
                 MatchBy.Phone,
                 email: "#dss@sdsdsxxx.sooedm,W222",
                 phone: NotExistPhone,
@@ -364,13 +378,13 @@ namespace Multi.WebDaoTests.LibTests
             );
         }
 
-        private AddSubscriberResult FieldIsRequired(MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
+        private AddSubscriberResult FieldIsRequired(ChannelType channelType, MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
         {
             AddSubscriberResult result = null;
 
             try
             {
-                result = SM_AddAndIgnore(matchBy)
+                result = SM_AddAndIgnore(channelType, matchBy)
                     .AddSubscriber(
                         ActiveSubscribedListId,
                         id: subscriberId,
@@ -409,30 +423,30 @@ namespace Multi.WebDaoTests.LibTests
         [ExpectedException(typeof(SubscriberManagerException))]
         public void AddSubscriber_Email_E_InvalidPropValue_Test()
         {
-            InvalidPropValue(MatchBy.Email, email: ExistEmail);
+            InvalidPropValue(ChannelType.SmsMms, MatchBy.Email, email: ExistEmail);
         }
 
         [TestMethod]
         [ExpectedException(typeof(SubscriberManagerException))]
         public void AddSubscriber_Phone_P_InvalidPropValue_Test()
         {
-            InvalidPropValue(MatchBy.Phone, phone: ExistPhone);
+            InvalidPropValue(ChannelType.SmsMms, MatchBy.Phone, phone: ExistPhone);
         }
 
         [TestMethod]
         [ExpectedException(typeof(SubscriberManagerException))]
         public void AddSubscriber_Email_D_InvalidPropValue_Test()
         {
-            InvalidPropValue(MatchBy.Email, emailMd5: ExistMd5);
+            InvalidPropValue(ChannelType.SmsMms, MatchBy.Email, emailMd5: ExistMd5);
         }
 
-        public AddSubscriberResult InvalidPropValue(MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
+        public AddSubscriberResult InvalidPropValue(ChannelType channelType, MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
         {
             AddSubscriberResult result = null;
 
             try
             {
-                result = SM_AddAndIgnore(matchBy)
+                result = SM_AddAndIgnore(channelType, matchBy)
                     .AddSubscriber(
                         ActiveSubscribedListId,
                         id: subscriberId,
@@ -474,22 +488,22 @@ namespace Multi.WebDaoTests.LibTests
         [TestMethod]
         public void AddSubscriber_Email_WasIgnored_Test()
         {
-            WasIgnored(MatchBy.Email, email: ExistEmail);
+            WasIgnored(ChannelType.SmsMms, MatchBy.Email, email: ExistEmail);
         }
 
         [TestMethod]
         public void AddSubscriber_Phone_WasIgnored_Test()
         {
-            WasIgnored(MatchBy.Phone, phone: ExistPhone);
+            WasIgnored(ChannelType.SmsMms, MatchBy.Phone, phone: ExistPhone);
         }
 
-        public AddSubscriberResult WasIgnored(MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
+        public AddSubscriberResult WasIgnored(ChannelType channelType, MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
         {
             AddSubscriberResult result = null;
 
             try
             {
-                result = SM_AddAndIgnore(matchBy)
+                result = SM_AddAndIgnore(channelType, matchBy)
                     .AddSubscriber(
                         ActiveSubscribedListId,
                         id: subscriberId,
@@ -537,22 +551,22 @@ namespace Multi.WebDaoTests.LibTests
         [TestMethod]
         public void AddSubscriber_Email_WasAlreadyOnList_Test()
         {
-            var result = WasAlreadyOnList(MatchBy.Email, email: ExistEmail);
+            var result = WasAlreadyOnList(ChannelType.SmsMms, MatchBy.Email, email: ExistEmail);
         }
 
         [TestMethod]
         public void AddSubscriber_Phone_WasAlreadyOnList_Test()
         {
-            var result = WasAlreadyOnList(MatchBy.Phone, phone: ExistPhone);
+            var result = WasAlreadyOnList(ChannelType.SmsMms, MatchBy.Phone, phone: ExistPhone);
         }
 
-        private AddSubscriberResult WasAlreadyOnList(MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
+        private AddSubscriberResult WasAlreadyOnList(ChannelType channelType, MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
         {
             AddSubscriberResult result = null;
 
             try
             {
-                result = SM_AddAndUpdate(matchBy)
+                result = SM_AddAndUpdate(channelType, matchBy)
                     .AddSubscriber(
                         listId: ActiveSubscribedListId,
                         email: email,
@@ -600,7 +614,7 @@ namespace Multi.WebDaoTests.LibTests
         [TestMethod]
         public void AddSubscriber_Email_E_WasAddedToList_Test()
         {
-            var result = WasAddedToList(MatchBy.Email, email: ExistEmail);
+            var result = WasAddedToList(ChannelType.SmsMms, MatchBy.Email, email: ExistEmail);
 
             var fact = result.Item2;
             if (fact != null)
@@ -628,7 +642,7 @@ namespace Multi.WebDaoTests.LibTests
         [TestMethod]
         public void AddSubscriber_Email_D_WasAddedToList_Test()
         {
-            var result = WasAddedToList(MatchBy.Email, emailMd5: ExistMd5);
+            var result = WasAddedToList(ChannelType.SmsMms, MatchBy.Email, emailMd5: ExistMd5);
 
             var fact = result.Item2;
             if (fact != null)
@@ -656,7 +670,7 @@ namespace Multi.WebDaoTests.LibTests
         [TestMethod]
         public void AddSubscriber_Phone_P_WasAddedToList_Test()
         {
-            var result = WasAddedToList(MatchBy.Phone, phone: ExistPhone);
+            var result = WasAddedToList(ChannelType.SmsMms, MatchBy.Phone, phone: ExistPhone);
 
             var fact = result.Item2;
             if (fact != null)
@@ -681,14 +695,14 @@ namespace Multi.WebDaoTests.LibTests
             Assert.AreEqual(1000, subscriber.FamilyDomainId);
         }
 
-        private Tuple<AddSubscriberResult, FactSubscription> WasAddedToList(MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
+        private Tuple<AddSubscriberResult, FactSubscription> WasAddedToList(ChannelType channelType, MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
         {
             AddSubscriberResult result = null;
             FactSubscription fact = null;
 
             try
             {
-                result = SM_AddAndUpdate(matchBy)
+                result = SM_AddAndUpdate(channelType, matchBy)
                     .AddSubscriber(
                         ActiveNotSubscribedListId,
                         id: subscriberId,
@@ -732,23 +746,23 @@ namespace Multi.WebDaoTests.LibTests
         [ExpectedException(typeof(SubscriberManagerException))]
         public void AddSubscriber_Email_EmailRejected_Test()
         {
-            var result = EmailRejected(MatchBy.Email, email: ExistEmail);
+            var result = EmailRejected(ChannelType.SmsMms, MatchBy.Email, email: ExistEmail);
         }
 
         [TestMethod]
         [ExpectedException(typeof(SubscriberManagerException))]
         public void AddSubscriber_Phone_EmailRejected_Test()
         {
-            var result = EmailRejected(MatchBy.Phone, phone: ExistPhone);
+            var result = EmailRejected(ChannelType.SmsMms, MatchBy.Phone, phone: ExistPhone);
         }
 
-        public AddSubscriberResult EmailRejected(MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
+        public AddSubscriberResult EmailRejected(ChannelType channelType, MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
         {
             AddSubscriberResult result = null;
 
             try
             {
-                result = SM_AddAndUpdate(matchBy)
+                result = SM_AddAndUpdate(channelType, matchBy)
                     .AddSubscriber(
                         ActiveComplaintListId,
                         id: subscriberId,
@@ -795,22 +809,22 @@ namespace Multi.WebDaoTests.LibTests
         [ExpectedException(typeof(SubscriberManagerException))]
         public void AddSubscriber_Email_AddUnsubscribed_EmailRejected_Test()
         {
-            var result = AddUnsubscribed(MatchBy.Email, email: ExistEmail);
+            var result = AddUnsubscribed(ChannelType.SmsMms, MatchBy.Email, email: ExistEmail);
         }
 
         [TestMethod]
         [ExpectedException(typeof(SubscriberManagerException))]
         public void AddSubscriber_Phone_AddUnsubscribed_EmailRejected_Test()
         {
-            var result = AddUnsubscribed(MatchBy.Phone, phone: ExistPhone);
+            var result = AddUnsubscribed(ChannelType.SmsMms, MatchBy.Phone, phone: ExistPhone);
         }
 
-        private AddSubscriberResult AddUnsubscribed(MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
+        private AddSubscriberResult AddUnsubscribed(ChannelType channelType, MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
         {
             AddSubscriberResult result = null;
             try
             {
-                result = SM_AddAndUpdate_AddUnsubscribed(matchBy)
+                result = SM_AddAndUpdate_AddUnsubscribed(channelType, matchBy)
                     .AddSubscriber(
                         ActiveComplaintListId,
                         id: subscriberId,
@@ -856,7 +870,7 @@ namespace Multi.WebDaoTests.LibTests
         [TestMethod]
         public void AddSubscriber_Email_WasReAddedToList_Test()
         {
-            var result = WasReAddedToList(MatchBy.Email, email: ExistEmail);
+            var result = WasReAddedToList(ChannelType.SmsMms, MatchBy.Email, email: ExistEmail);
 
             var fact = result.Item2;
             if (fact != null)
@@ -879,7 +893,7 @@ namespace Multi.WebDaoTests.LibTests
         [TestMethod]
         public void AddSubscriber_Phone_WasReAddedToList_Test()
         {
-            var result = WasReAddedToList(MatchBy.Phone, phone: ExistPhone);
+            var result = WasReAddedToList(ChannelType.SmsMms, MatchBy.Phone, phone: ExistPhone);
 
             var fact = result.Item2;
             if (fact != null)
@@ -899,14 +913,14 @@ namespace Multi.WebDaoTests.LibTests
             Assert.IsTrue(ExistPhone.StartsWith(subscriber.DialingPrefix));
         }
 
-        private Tuple<AddSubscriberResult, FactSubscription> WasReAddedToList(MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
+        private Tuple<AddSubscriberResult, FactSubscription> WasReAddedToList(ChannelType channelType, MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
         {
             AddSubscriberResult result = null;
             FactSubscription fact = null;
 
             try
             {
-                result = SM_AddAndUpdate_AllowUnsubscribedByUser(matchBy)
+                result = SM_AddAndUpdate_AllowUnsubscribedByUser(channelType, matchBy)
                     .AddSubscriber(
                         ActiveUnsubscribedApiListId,
                         id: subscriberId,
@@ -958,7 +972,7 @@ namespace Multi.WebDaoTests.LibTests
         [TestMethod]
         public void AddSubscriber_Email_E_WasAdded_Test()
         {
-            var result = WasAdded(MatchBy.Email, email: NotExistEmail);
+            var result = WasAdded(ChannelType.SmsMms, MatchBy.Email, email: NotExistEmail);
 
             var fact = result.Item2.SingleOrDefault();
             if (fact != null)
@@ -986,7 +1000,7 @@ namespace Multi.WebDaoTests.LibTests
         [TestMethod]
         public void AddSubscriber_Email_EP0_WasAdded_Test()
         {
-            var result = WasAdded(MatchBy.Email, email: NotExistEmail, phone: string.Empty);
+            var result = WasAdded(ChannelType.SmsMms, MatchBy.Email, email: NotExistEmail, phone: string.Empty);
 
             var fact = result.Item2.SingleOrDefault();
             if (fact != null)
@@ -1018,7 +1032,7 @@ namespace Multi.WebDaoTests.LibTests
         [TestMethod]
         public void AddSubscriber_Email_EP1_WasAdded_Test()
         {
-            var result = WasAdded(MatchBy.Email, email: NotExistEmail, phone: " ");
+            var result = WasAdded(ChannelType.SmsMms, MatchBy.Email, email: NotExistEmail, phone: " ");
 
             var fact = result.Item2.SingleOrDefault();
             if (fact != null)
@@ -1050,7 +1064,7 @@ namespace Multi.WebDaoTests.LibTests
         [TestMethod]
         public void AddSubscriber_Phone_P_WasAdded_Test()
         {
-            var result = WasAdded(MatchBy.Phone, phone: NotExistPhone);
+            var result = WasAdded(ChannelType.SmsMms, MatchBy.Phone, phone: NotExistPhone);
 
             var fact = result.Item2.SingleOrDefault();
             if (fact != null)
@@ -1077,7 +1091,7 @@ namespace Multi.WebDaoTests.LibTests
         [TestMethod]
         public void AddSubscriber_Phone_E0P_WasAdded_Test()
         {
-            var result = WasAdded(MatchBy.Phone, phone: NotExistPhone, email: string.Empty);
+            var result = WasAdded(ChannelType.SmsMms, MatchBy.Phone, phone: NotExistPhone, email: string.Empty);
 
             var fact = result.Item2.SingleOrDefault();
             if (fact != null)
@@ -1108,7 +1122,7 @@ namespace Multi.WebDaoTests.LibTests
         [TestMethod]
         public void AddSubscriber_Phone_E1P_WasAdded_Test()
         {
-            var result = WasAdded(MatchBy.Phone, phone: NotExistPhone, email: " ");
+            var result = WasAdded(ChannelType.SmsMms, MatchBy.Phone, phone: NotExistPhone, email: " ");
 
             var fact = result.Item2.SingleOrDefault();
             if (fact != null)
@@ -1139,7 +1153,7 @@ namespace Multi.WebDaoTests.LibTests
         [TestMethod]
         public void AddSubscriber_Phone_E3P_WasAdded_Test()
         {
-            var result = WasAdded(MatchBy.Phone, phone: NotExistPhone, email: "   ");
+            var result = WasAdded(ChannelType.SmsMms, MatchBy.Phone, phone: NotExistPhone, email: "   ");
 
             var fact = result.Item2.SingleOrDefault();
             if (fact != null)
@@ -1170,7 +1184,7 @@ namespace Multi.WebDaoTests.LibTests
         [TestMethod]
         public void AddSubscriber_Email_EP_WasAdded_Test()
         {
-            var result = WasAdded(MatchBy.Email, email: NotExistEmail, phone: NotExistPhone);
+            var result = WasAdded(ChannelType.SmsMms, MatchBy.Email, email: NotExistEmail, phone: NotExistPhone);
 
             var facts = result.Item2;
             Assert.AreEqual(2, facts.Length);
@@ -1208,14 +1222,14 @@ namespace Multi.WebDaoTests.LibTests
             Assert.AreEqual(SubscriberFirstname, subscriber.Firstname);
         }
 
-        private Tuple<AddSubscriberResult, FactSubscription[]> WasAdded(MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
+        private Tuple<AddSubscriberResult, FactSubscription[]> WasAdded(ChannelType channelType, MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
         {
             AddSubscriberResult result = null;
             FactSubscription[] facts = null;
 
             try
             {
-                result = SM_AddAndUpdate(matchBy)
+                result = SM_AddAndUpdate(channelType, matchBy)
                     .AddSubscriber(
                         ActiveNotSubscribedListId,
                         id: subscriberId,
@@ -1263,6 +1277,7 @@ namespace Multi.WebDaoTests.LibTests
         public void AddSubscriber_Email_E_ReplaceSubscriber_Test()
         {
             var result = ReplaceSubscriber(
+                ChannelType.Email,
                 MatchBy.Email,
                 email: ExistEmail
             );
@@ -1294,6 +1309,7 @@ namespace Multi.WebDaoTests.LibTests
         public void AddSubscriber_Phone_P_ReplaceSubscriber_Test()
         {
             var result = ReplaceSubscriber(
+                ChannelType.Email,
                 MatchBy.Phone,
                 phone: ExistPhone
             );
@@ -1321,14 +1337,14 @@ namespace Multi.WebDaoTests.LibTests
             Assert.IsTrue(ExistPhone.StartsWith(subscriber.DialingPrefix));
         }
 
-        private Tuple<AddSubscriberResult, FactSubscription> ReplaceSubscriber(MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
+        private Tuple<AddSubscriberResult, FactSubscription> ReplaceSubscriber(ChannelType channelType, MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
         {
             AddSubscriberResult result = null;
             FactSubscription fact = null;
 
             try
             {
-                result = SM_AddAndReplace(matchBy)
+                result = SM_AddAndReplace(channelType, matchBy)
                     .AddSubscriber(
                         ActiveNotSubscribedListId,
                         id: subscriberId,
@@ -1501,7 +1517,7 @@ namespace Multi.WebDaoTests.LibTests
         [TestMethod]
         public void AddSubscriber_Email_I_ChangeContacts_Test()
         {
-            var result = ChangeContacts(MatchBy.Id, subscriberId: ExistSubscriberId, email: NotExistEmail);
+            var result = ChangeContacts(ChannelType.SmsMms, MatchBy.Id, subscriberId: ExistSubscriberId, email: NotExistEmail);
 
             Assert.AreEqual(NotExistEmail, result.Item1.SubscriberEmail);
 
@@ -1530,7 +1546,7 @@ namespace Multi.WebDaoTests.LibTests
         [TestMethod]
         public void AddSubscriber_Email_D_ChangeContacts_Test()
         {
-            var result = ChangeContacts(MatchBy.Email, emailMd5: ExistMd5, email: NotExistEmail);
+            var result = ChangeContacts(ChannelType.SmsMms, MatchBy.Email, emailMd5: ExistMd5, email: NotExistEmail);
 
             Assert.AreEqual(NotExistEmail, result.Item1.SubscriberEmail);
 
@@ -1559,7 +1575,7 @@ namespace Multi.WebDaoTests.LibTests
         [TestMethod]
         public void AddSubscriber_Custom_EP_ChangeContacts_Test()
         {
-            var result = ChangeContacts(MatchBy.CustomSubscriberId, customSubscriberId: ExistCustomSubscriberId, email: NotExistEmail, phone: NotExistPhone);
+            var result = ChangeContacts(ChannelType.SmsMms, MatchBy.CustomSubscriberId, customSubscriberId: ExistCustomSubscriberId, email: NotExistEmail, phone: NotExistPhone);
 
             Assert.AreEqual(NotExistEmail, result.Item1.SubscriberEmail);
 
@@ -1594,14 +1610,14 @@ namespace Multi.WebDaoTests.LibTests
             Assert.IsTrue(NotExistPhone.StartsWith(subscriber.DialingPrefix));
         }
 
-        private Tuple<AddSubscriberResult, FactSubscription[]> ChangeContacts(MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
+        private Tuple<AddSubscriberResult, FactSubscription[]> ChangeContacts(ChannelType channelType, MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
         {
             AddSubscriberResult result = null;
             FactSubscription[] facts = null;
 
             try
             {
-                result = SM_AddAndUpdate(matchBy)
+                result = SM_AddAndUpdate(channelType, matchBy)
                     .AddSubscriber(
                         ActiveNotSubscribedListId,
                         id: subscriberId,
@@ -1648,7 +1664,7 @@ namespace Multi.WebDaoTests.LibTests
         [TestMethod]
         public void AddSubscriber_Email_Update_ChangeSubscriberData_Test()
         {
-            var result = ChangeSubscriberData(true, MatchBy.Email, email: ExistEmail);
+            var result = ChangeSubscriberData(true, ChannelType.SmsMms, MatchBy.Email, email: ExistEmail);
 
             Assert.AreEqual(ExistEmail, result.Item1.SubscriberEmail);
 
@@ -1680,7 +1696,7 @@ namespace Multi.WebDaoTests.LibTests
         [TestMethod]
         public void AddSubscriber_Email_Replace_ChangeSubscriberData_Test()
         {
-            var result = ChangeSubscriberData(false, MatchBy.Email, email: ExistEmail);
+            var result = ChangeSubscriberData(false, ChannelType.SmsMms, MatchBy.Email, email: ExistEmail);
 
             Assert.AreEqual(ExistEmail, result.Item1.SubscriberEmail);
 
@@ -1709,12 +1725,12 @@ namespace Multi.WebDaoTests.LibTests
             Assert.AreEqual("Nowacki", subscriber.Lastname);
         }
 
-        private Tuple<AddSubscriberResult, FactSubscription[]> ChangeSubscriberData(bool isUpdate, MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
+        private Tuple<AddSubscriberResult, FactSubscription[]> ChangeSubscriberData(bool isUpdate, ChannelType channelType, MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
         {
             AddSubscriberResult result = null;
             FactSubscription[] facts = null;
 
-            var sm = isUpdate ? SM_AddAndUpdate(matchBy) : SM_AddAndReplace(matchBy);
+            var sm = isUpdate ? SM_AddAndUpdate(channelType, matchBy) : SM_AddAndReplace(channelType, matchBy);
 
             try
             {
@@ -1762,7 +1778,7 @@ namespace Multi.WebDaoTests.LibTests
 
         #region GetSubscriberManager
 
-        private SubscriberManager SM_AddAndIgnore(MatchBy matchBy)
+        private SubscriberManager SM_AddAndIgnore(ChannelType channelType, MatchBy matchBy)
         {
             var subscriberManager = Container.GetInstance<SubscriberManager>();
             return subscriberManager
@@ -1771,6 +1787,7 @@ namespace Multi.WebDaoTests.LibTests
                     SubscriberManagerMode.AddAndIgnore,
                     SubscriptionSource.Api,
                     matchBy: matchBy,
+                    channelType: channelType,
                     forceConfirmation: false,
                     addUnsubscribed: false,
                     addUnsubscribedByUser: false,
@@ -1778,7 +1795,7 @@ namespace Multi.WebDaoTests.LibTests
                 );
         }
 
-        private SubscriberManager SM_AddAndUpdate(MatchBy matchBy)
+        private SubscriberManager SM_AddAndUpdate(ChannelType channelType, MatchBy matchBy)
         {
             var subscriberManager = Container.GetInstance<SubscriberManager>();
             return subscriberManager
@@ -1787,6 +1804,7 @@ namespace Multi.WebDaoTests.LibTests
                     SubscriberManagerMode.AddAndUpdate,
                     SubscriptionSource.Api,
                     matchBy: matchBy,
+                    channelType: channelType,
                     forceConfirmation: false,
                     addUnsubscribed: false,
                     addUnsubscribedByUser: false,
@@ -1794,7 +1812,7 @@ namespace Multi.WebDaoTests.LibTests
                 );
         }
 
-        private SubscriberManager SM_AddAndUpdate_AddUnsubscribed(MatchBy matchBy)
+        private SubscriberManager SM_AddAndUpdate_AddUnsubscribed(ChannelType channelType, MatchBy matchBy)
         {
             var subscriberManager = Container.GetInstance<SubscriberManager>();
             return subscriberManager
@@ -1803,6 +1821,7 @@ namespace Multi.WebDaoTests.LibTests
                     SubscriberManagerMode.AddAndUpdate,
                     SubscriptionSource.Api,
                     matchBy: matchBy,
+                    channelType: channelType,
                     forceConfirmation: false,
                     addUnsubscribed: true,
                     addUnsubscribedByUser: false,
@@ -1810,7 +1829,7 @@ namespace Multi.WebDaoTests.LibTests
                 );
         }
 
-        private SubscriberManager SM_AddAndUpdate_AllowUnsubscribedByUser(MatchBy matchBy)
+        private SubscriberManager SM_AddAndUpdate_AllowUnsubscribedByUser(ChannelType channelType, MatchBy matchBy)
         {
             var subscriberManager = Container.GetInstance<SubscriberManager>();
             return subscriberManager
@@ -1819,6 +1838,7 @@ namespace Multi.WebDaoTests.LibTests
                     SubscriberManagerMode.AddAndUpdate,
                     SubscriptionSource.Api,
                     matchBy: matchBy,
+                    channelType: channelType,
                     forceConfirmation: false,
                     addUnsubscribed: false,
                     addUnsubscribedByUser: true,
@@ -1826,7 +1846,7 @@ namespace Multi.WebDaoTests.LibTests
                 );
         }
 
-        private SubscriberManager SM_AddAndReplace(MatchBy matchBy)
+        private SubscriberManager SM_AddAndReplace(ChannelType channelType, MatchBy matchBy)
         {
             var subscriberManager = Container.GetInstance<SubscriberManager>();
             return subscriberManager
@@ -1835,6 +1855,7 @@ namespace Multi.WebDaoTests.LibTests
                     SubscriberManagerMode.AddAndReplace,
                     SubscriptionSource.Api,
                     matchBy: matchBy,
+                    channelType: channelType,
                     forceConfirmation: false,
                     addUnsubscribed: false,
                     addUnsubscribedByUser: false,
