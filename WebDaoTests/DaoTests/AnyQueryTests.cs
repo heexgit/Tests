@@ -9,7 +9,7 @@ using NHibernate;
 using WebDaoTests.Core;
 using EsAppContext = WebDaoTests.Mocks.EsAppContext;
 
-namespace WebDaoTests.TestsDao
+namespace WebDaoTests.DaoTests
 {
     internal class AnyQueryTests : Tester
     {

@@ -1,6 +1,5 @@
-﻿
-using WebDaoTests.TestsDao;
-using WebDaoTests.TestsLib;
+﻿using WebDaoTests.DaoTests;
+using WebDaoTests.LibTests;
 
 namespace WebDaoTests
 {
@@ -9,7 +8,8 @@ namespace WebDaoTests
         private static void Main()
         {
             //new AnyQueryTests().Start();
-            new SubscriberDaoTests().Start();
+            //new SubscriberDaoTests().Start();
+            new StructureMapTests().Start();
             //new UserDaoTests().Start();
             //new MessageContentDaoTests().Start();
             //new FactExtendedPropertiesDaoTests().Start();

@@ -2,7 +2,7 @@
 using ExpertSender.DataModel.Dao;
 using WebDaoTests.Core;
 
-namespace WebDaoTests.TestsDao
+namespace WebDaoTests.DaoTests
 {
     internal class UserDaoTests : Tester
     {
