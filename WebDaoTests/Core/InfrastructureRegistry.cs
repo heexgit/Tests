@@ -6,7 +6,6 @@ using ExpertSender.DataModel.Distributed.Enums;
 using ExpertSender.DataModel.Helpers;
 using ExpertSender.Lib.Cache;
 using MaxMind.GeoIP2;
-using NHibernate;
 using StructureMap;
 
 namespace WebDaoTests.Core
@@ -18,32 +17,7 @@ namespace WebDaoTests.Core
     {
         public InfrastructureRegistry()
         {
-            //For<ISessionFactory>().Singleton().Use(ctx =>
-            //    new Configuration()
-            //        .Configure()
-            //        .SetInterceptor(ctx.GetInstance<EntityStructureMapInterceptor>())
-            //        .BuildSessionFactory()
-            //);
-
-            //For<ISession>().HttpContextScoped().Use(context => IoC.GetContextSession(context));
-
-            //For<IControllerActivator>().Use<StructureMapControllerActivator>();
-
-            //For<DefaultModelBinder>()
-            //    .Use<SmartBinder>()
-            //    .EnumerableOf<IFilteredModelBinder>()
-            //    .Contains(y =>
-            //    {
-            //        y.Type<AuthorisedUserViewModelBinder>();
-            //    }
-            //);
-
-            //For<IFormsAuthentication>().Use<FormsAuthenticationService>();
-
-            //For<ModelMetadataProvider>().Use<EsDataAnnotationsModelMetadataProvider>();
-
             For<IEsAppContext>().Use<Mocks.EsAppContext>();
-            //For<IAppContext>().HttpContextScoped().Use<AppContext>();
 
             //For<ITempDataProvider>().Use<CacheTempDataProvider>();
             For<ICacheProvider>().Use<AppFabricCacheProvider>().SetProperty(c => c.SetConfig(new AppFabricCacheConfig()));

@@ -9,6 +9,7 @@ using ExpertSender.Common.Helpers;
 using ExpertSender.DataModel.CommonDao;
 using ExpertSender.Lib.Cache;
 using StructureMap;
+using StructureMap.Pipeline;
 
 namespace BackendDaoTests.Core
 {
@@ -20,13 +21,11 @@ namespace BackendDaoTests.Core
         public InfrastructureRegistry()
         {
             For<IEsAppContext>().Use<Mocks.EsAppContext>();
-            For<IDbConnection>()
-                //.HybridHttpOrThreadLocalScoped()
+            For<IDbConnection>(Lifecycles.ThreadLocal)
                 .Use<SqlConnection>()
                 .SelectConstructor(() => new SqlConnection(string.Empty))
                 .Ctor<string>().Is(AppConfig.ConnectionString);
-            For<IDbTransactionProvider>()
-                //.HybridHttpOrThreadLocalScoped()
+            For<IDbTransactionProvider>(Lifecycles.ThreadLocal)
                 .Use<DbTransactionProvider>();
             //For<IServiceHost>().Use<ServiceHost>();
             For<ICacheProvider>().Use<AppFabricCacheProvider>().SetProperty(c => c.SetConfig(new AppFabricCacheConfig()));

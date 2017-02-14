@@ -1,20 +1,23 @@
-﻿using ExpertSender.Backend.DAL.Registry;
+﻿using System;
+using System.Data;
+using ExpertSender.Backend.DAL.Registry;
 using ExpertSender.Common;
+using ExpertSender.Common.Dao;
 using ExpertSender.Common.Helpers;
 using StructureMap;
 
 namespace BackendDaoTests.Core
 {
-    internal abstract class Tester
+    internal abstract class Tester : IDisposable
     {
         protected IContainer Container { get; private set; }
-        //private ISessionFactory _sessionFactory;
+
+        private readonly IDbConnection _connection;
+        private readonly IDbTransactionProvider _transactionProvider;
 
         protected Tester()
         {
             PrepareContainer();
-
-            //PrepareNHibernate();
         }
 
         protected Tester(IEsAppContext appContext)
@@ -23,18 +26,17 @@ namespace BackendDaoTests.Core
 
             Container.Inject(appContext);
 
-            //PrepareNHibernate();
+            _connection = Container.GetInstance<IDbConnection>();
+            _connection.Open();
+            _transactionProvider = Container.GetInstance<IDbTransactionProvider>();
+            _transactionProvider.BeginTransaction();
         }
 
-        //private void PrepareNHibernate()
-        //{
-        //    var config = new NHibernate.Cfg.Configuration().Configure();
-
-        //    var connstring = config.Properties[NHibernate.Cfg.Environment.ConnectionString];
-        //    ReflectionHelper.SetValueOfPrivateStaticField(typeof(DynamicConnectionProvider), "_connectionString", connstring);
-
-        //    _sessionFactory = config.BuildSessionFactory();
-        //}
+        public void Dispose()
+        {
+            _transactionProvider.RollbackTransaction();
+            _connection.Close();
+        }
 
         private void PrepareContainer()
         {
@@ -47,23 +49,10 @@ namespace BackendDaoTests.Core
                     c.AddRegistry<DaoRegistry>();
 
                     c.Policies.FillAllPropertiesOfType<IContainer>();
-                    //c.Policies.FillAllPropertiesOfType<ISession>().Use(context => GetContextSession(context));
                 });
                 StaticsProvider.Container = Container;
             }
         }
-
-        ///// <summary>
-        ///// Nhibernate w ES2 nie uzywa transakcji (nie ma automatycznego rozpoczynania trnsakcji przy otwieraniu sesji). 
-        ///// Jest to sprzeczne z dobrymi praktykami ale niesamowicie upraszcza przelaczanie sie pomiedzy unitami.
-        ///// Nie musimy troszczyc sie o komitowanie / rollbackowanie transakcji. Po prostu zmieniamy connection string w locie. 
-        ///// </summary>
-        ///// <param name="structureMapContext"></param>
-        ///// <returns></returns>
-        //public ISession GetContextSession(IContext structureMapContext)
-        //{
-        //    return _sessionFactory.OpenSession();
-        //}
 
         public abstract void Start();
     }

@@ -1,4 +1,5 @@
-﻿using ExpertSender.Common;
+﻿using System;
+using ExpertSender.Common;
 using ExpertSender.Common.Helpers;
 using ExpertSender.DAL.Core;
 using ExpertSender.DAL.Registry;
@@ -7,10 +8,11 @@ using StructureMap;
 
 namespace WebDaoTests.Core
 {
-    public abstract class Tester
+    public abstract class Tester : IDisposable
     {
         protected IContainer Container { get; private set; }
         private ISessionFactory _sessionFactory;
+        private ITransaction _transaction;
 
         protected Tester()
         {
@@ -28,6 +30,11 @@ namespace WebDaoTests.Core
             PrepareNHibernate();
         }
 
+        public void Dispose()
+        {
+            _transaction.Rollback();
+        }
+
         private void PrepareNHibernate()
         {
             var config = new NHibernate.Cfg.Configuration().Configure();
@@ -37,6 +44,8 @@ namespace WebDaoTests.Core
             ReflectionHelper.SetValueOfPrivateStaticField(typeof(DynamicConnectionProvider), "_connectionString", connstring);
 
             _sessionFactory = config.BuildSessionFactory();
+
+            _transaction = Container.GetInstance<ISession>().BeginTransaction();
         }
 
         private void PrepareContainer()

@@ -10,7 +10,6 @@ using ExpertSender.Lib;
 using ExpertSender.Lib.SubscriberManager;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using WebDaoTests.Core;
-using NHibernate;
 using EsAppContext = WebDaoTests.Mocks.EsAppContext;
 using Resources = ExpertSender.Lib.SubscriberManager.Resources;
 using SubscriberManager = ExpertSender.Lib.SubscriberManager.SubscriberManager;
@@ -20,9 +19,8 @@ using SubscriberManager = ExpertSender.Lib.SubscriberManager.SubscriberManager;
 namespace WebDaoTests.LibTests
 {
     [TestClass]
-    public class SubscriberManagerTests : Tester, IDisposable
+    public class SubscriberManagerTests : Tester
     {
-        private readonly ITransaction _transaction;
         private const int CurrentUnitId = 1;
 
         private const int ExistSubscriberId = 4238630;
@@ -72,19 +70,10 @@ namespace WebDaoTests.LibTests
 
         public SubscriberManagerTests()
             : base(new EsAppContext {CurrentServiceId = CurrentUnitId})
-        {
-            _transaction = Container.GetInstance<ISession>().BeginTransaction();
-        }
-
-        public void Dispose()
-        {
-            _transaction.Rollback();
-        }
+        { }
 
         public override void Start()
-        {
-            AddSubscriber_Email_E_ListDoesNotBelongToService_Test();
-        }
+        { }
 
         #region ListDoesNotBelongToService
 
@@ -240,7 +229,11 @@ namespace WebDaoTests.LibTests
                 ifErrorConditition: ex => ex.FieldsErrors.SingleOrDefault(e => e.Key == "customSubscriberId").Value.Contains(Resources.SubscriberManager.CustomSubscriberIdIsInvalid)
             );
         }
-
+        
+        /// <summary>
+        /// Przy MatchBy.CustomSubscriberId wymagane są customSubscriberId oraz Email lub Telefon
+        /// Dla kanału SmsMms podajemy komunikat o wymaganym mailu lub telefonie
+        /// </summary>
         [TestMethod]
         [ExpectedException(typeof(SubscriberManagerException))]
         public void AddSubscriber_Custom_NoData_FieldIsRequired_Test()
@@ -249,12 +242,37 @@ namespace WebDaoTests.LibTests
                 ChannelType.SmsMms,
                 MatchBy.CustomSubscriberId,
                 ifErrorConditition: ex =>
-                    ex.FieldsErrors.SingleOrDefault(e => e.Key == "customSubscriberId").Value.Contains(Resources.SubscriberManager.CustomSubscriberIdIsInvalid)
-                    && ex.FieldsErrors.SingleOrDefault(e => e.Key == "email").Value.Contains(Resources.SubscriberManager.EmailOrPhoneRequired)
-                    && ex.FieldsErrors.SingleOrDefault(e => e.Key == "phone").Value.Contains(Resources.SubscriberManager.EmailOrPhoneRequired)
+                    ex.FieldsErrors.Count == 3
+                    && !ex.PropertiesErrors.Any()
+                    && ex.FieldsErrors.Any(e => e.Key == "customSubscriberId" && e.Value.Contains(Resources.SubscriberManager.CustomSubscriberIdIsInvalid))
+                    && ex.FieldsErrors.Any(e => e.Key == "email" && e.Value.Contains(Resources.SubscriberManager.EmailOrPhoneRequired))
+                    && ex.FieldsErrors.Any(e => e.Key == "phone" && e.Value.Contains(Resources.SubscriberManager.EmailOrPhoneRequired))
+            );
+        }
+        
+        /// <summary>
+        /// Przy MatchBy.CustomSubscriberId wymagane są customSubscriberId oraz Email lub Telefon
+        /// Dla kanału Email nie podajemy komunikatu o wymaganym telefonie
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(SubscriberManagerException))]
+        public void AddSubscriber_Custom_NoData_ChEmail_FieldIsRequired_Test()
+        {
+            var result = FieldIsRequired(
+                ChannelType.Email,
+                MatchBy.CustomSubscriberId,
+                ifErrorConditition: ex =>
+                    ex.FieldsErrors.Count == 2
+                    && !ex.PropertiesErrors.Any()
+                    && ex.FieldsErrors.Any(e => e.Key == "customSubscriberId" && e.Value.Contains(Resources.SubscriberManager.CustomSubscriberIdIsInvalid))
+                    && ex.FieldsErrors.Any(e => e.Key == "email" && e.Value.Contains(Resources.SubscriberManager.EmailRequired))
             );
         }
 
+        /// <summary>
+        /// Przy MatchBy.CustomSubscriberId wymagany jest Email lub Telefon
+        /// Dla kanału SmsMms podajemy komunikat o wymaganym mailu lub telefonie
+        /// </summary>
         [TestMethod]
         [ExpectedException(typeof(SubscriberManagerException))]
         public void AddSubscriber_Custom_NoContacts_FieldIsRequired_Test()
@@ -264,8 +282,29 @@ namespace WebDaoTests.LibTests
                 MatchBy.CustomSubscriberId,
                 customSubscriberId: ExistCustomSubscriberId,
                 ifErrorConditition: ex =>
-                    ex.FieldsErrors.SingleOrDefault(e => e.Key == "email").Value.Contains(Resources.SubscriberManager.EmailOrPhoneRequired)
-                    && ex.FieldsErrors.SingleOrDefault(e => e.Key == "phone").Value.Contains(Resources.SubscriberManager.EmailOrPhoneRequired)
+                    ex.FieldsErrors.Count == 2
+                    && !ex.PropertiesErrors.Any()
+                    && ex.FieldsErrors.Any(e => e.Key == "email" && e.Value.Contains(Resources.SubscriberManager.EmailOrPhoneRequired))
+                    && ex.FieldsErrors.Any(e => e.Key == "phone" && e.Value.Contains(Resources.SubscriberManager.EmailOrPhoneRequired))
+            );
+        }
+
+        /// <summary>
+        /// Przy MatchBy.CustomSubscriberId wymagany jest Email
+        /// Dla kanału Email nie podajemy komunikatu o wymaganym telefonie
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(SubscriberManagerException))]
+        public void AddSubscriber_Custom_NoContacts_ChEmail_FieldIsRequired_Test()
+        {
+            var result = FieldIsRequired(
+                ChannelType.Email,
+                MatchBy.CustomSubscriberId,
+                customSubscriberId: ExistCustomSubscriberId,
+                ifErrorConditition: ex =>
+                    ex.FieldsErrors.Count == 1
+                    && !ex.PropertiesErrors.Any()
+                    && ex.FieldsErrors.Any(e => e.Key == "email" && e.Value.Contains(Resources.SubscriberManager.EmailRequired))
             );
         }
 
@@ -302,9 +341,9 @@ namespace WebDaoTests.LibTests
                 ChannelType.SmsMms,
                 MatchBy.Id,
                 ifErrorConditition: ex =>
-                    ex.FieldsErrors.SingleOrDefault(e => e.Key == "subscriberId").Value.Contains(Resources.SubscriberManager.IdIsInvalid)
-                    && ex.FieldsErrors.SingleOrDefault(e => e.Key == "email").Value.Contains(Resources.SubscriberManager.EmailOrPhoneRequired)
-                    && ex.FieldsErrors.SingleOrDefault(e => e.Key == "phone").Value.Contains(Resources.SubscriberManager.EmailOrPhoneRequired)
+                    ex.FieldsErrors.Any(e => e.Key == "subscriberId" && e.Value.Contains(Resources.SubscriberManager.IdIsInvalid))
+                    && ex.FieldsErrors.Any(e => e.Key == "email" && e.Value.Contains(Resources.SubscriberManager.EmailOrPhoneRequired))
+                    && ex.FieldsErrors.Any(e => e.Key == "phone" && e.Value.Contains(Resources.SubscriberManager.EmailOrPhoneRequired))
             );
         }
 
@@ -317,8 +356,8 @@ namespace WebDaoTests.LibTests
                 MatchBy.Id,
                 subscriberId: ExistSubscriberId,
                 ifErrorConditition: ex =>
-                    ex.FieldsErrors.SingleOrDefault(e => e.Key == "email").Value.Contains(Resources.SubscriberManager.EmailOrPhoneRequired)
-                    && ex.FieldsErrors.SingleOrDefault(e => e.Key == "phone").Value.Contains(Resources.SubscriberManager.EmailOrPhoneRequired)
+                    ex.FieldsErrors.Any(e => e.Key == "email" && e.Value.Contains(Resources.SubscriberManager.EmailOrPhoneRequired))
+                    && ex.FieldsErrors.Any(e => e.Key == "phone" && e.Value.Contains(Resources.SubscriberManager.EmailOrPhoneRequired))
             );
         }
 
@@ -332,7 +371,7 @@ namespace WebDaoTests.LibTests
                 email: NotExistEmail,
                 phone: "xxx",
                 ifErrorConditition: ex =>
-                    ex.FieldsErrors.SingleOrDefault(e => e.Key == "phone").Value.Contains(Resources.SubscriberManager.PhoneIsInvalid)
+                    ex.FieldsErrors.Any(e => e.Key == "phone" && e.Value.Contains(Resources.SubscriberManager.PhoneIsInvalid))
             );
         }
 
@@ -440,7 +479,7 @@ namespace WebDaoTests.LibTests
             InvalidPropValue(ChannelType.SmsMms, MatchBy.Email, emailMd5: ExistMd5);
         }
 
-        public AddSubscriberResult InvalidPropValue(ChannelType channelType, MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
+        private AddSubscriberResult InvalidPropValue(ChannelType channelType, MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
         {
             AddSubscriberResult result = null;
 
@@ -529,7 +568,8 @@ namespace WebDaoTests.LibTests
                 if (ifErrorConditition == null)
                 {
                     ifErrorConditition = exx =>
-                        exx.PropertiesErrors.SingleOrDefault(e => e.Key == RequiredPropertyInt).Value.Contains(string.Format(Resources.SubscriberManager.InvalidValue, "cecha liczbowa xx3"));
+                        exx.PropertiesErrors.Any(e => e.Key == RequiredPropertyInt && e.Value.Contains(string.Format(Resources.SubscriberManager.InvalidValue, "cecha liczbowa xx3")))
+                        && !exx.FieldsErrors.Any();
                 }
 
                 if (ifErrorConditition(ex))
@@ -537,10 +577,7 @@ namespace WebDaoTests.LibTests
             }
 
             Assert.IsNotNull(result);
-            if (result != null)
-            {
-                Assert.AreEqual(true, result.WasIgnored);
-            }
+            Assert.AreEqual(true, result.WasIgnored);
 
             return result;
         }
@@ -563,6 +600,7 @@ namespace WebDaoTests.LibTests
         private AddSubscriberResult WasAlreadyOnList(ChannelType channelType, MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
         {
             AddSubscriberResult result = null;
+            IEnumerable<FactSubscription> facts;
 
             try
             {
@@ -586,6 +624,8 @@ namespace WebDaoTests.LibTests
                             {DeletedProperty, "jakiś blok"}
                         }
                     );
+
+                facts = LoadSubscriptions(result.SubscriberId, result.ListId);
             }
             catch (SubscriberManagerException ex)
             {
@@ -600,10 +640,7 @@ namespace WebDaoTests.LibTests
             }
 
             Assert.IsNotNull(result);
-            if (result != null)
-            {
-                Assert.AreEqual(true, result.WasAlreadyOnList);
-            }
+            Assert.AreEqual(true, result.WasAlreadyOnList);
 
             return result;
         }
@@ -675,7 +712,7 @@ namespace WebDaoTests.LibTests
             var fact = result.Item2;
             if (fact != null)
             {
-                Assert.IsNull(fact.DomainId);
+                Assert.AreEqual(fact.DomainId, 0);
                 Assert.AreEqual(SubscriberIp, fact.ClientIp);
                 Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
 
@@ -867,12 +904,16 @@ namespace WebDaoTests.LibTests
 
         #region WasReAddedToList
 
+        /// <summary>
+        /// Sprawda czy Email zostanie ponownie wpisany na listę (zostanie usunięte wypisanie)
+        /// </summary>
         [TestMethod]
         public void AddSubscriber_Email_WasReAddedToList_Test()
         {
             var result = WasReAddedToList(ChannelType.SmsMms, MatchBy.Email, email: ExistEmail);
 
-            var fact = result.Item2;
+            var facts = result.Item2;
+            var fact = facts.SingleOrDefault();
             if (fact != null)
             {
                 Assert.AreEqual(3, fact.DomainId);
@@ -888,17 +929,22 @@ namespace WebDaoTests.LibTests
             Assert.AreEqual(ExistEmail, subscriber.Email);
             Assert.AreEqual(ExistMd5, CryptographyHelper.BytesToHexString(subscriber.EmailMd5).ToUpper());
             Assert.AreEqual(fact.DomainId, subscriber.DomainId);
-            Assert.AreEqual(1000, subscriber.FamilyDomainId);        }
+            Assert.AreEqual(1000, subscriber.FamilyDomainId);
+        }
 
+        /// <summary>
+        /// Sprawda czy Phone zostanie ponownie wpisany na listę (zostanie usunięte wypisanie)
+        /// </summary>
         [TestMethod]
         public void AddSubscriber_Phone_WasReAddedToList_Test()
         {
             var result = WasReAddedToList(ChannelType.SmsMms, MatchBy.Phone, phone: ExistPhone);
 
-            var fact = result.Item2;
+            var facts = result.Item2;
+            var fact = facts.SingleOrDefault();
             if (fact != null)
             {
-                Assert.IsNull(fact.DomainId);
+                Assert.AreEqual(fact.DomainId, 0);
                 Assert.AreEqual(SubscriberIp, fact.ClientIp);
                 Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
 
@@ -913,10 +959,10 @@ namespace WebDaoTests.LibTests
             Assert.IsTrue(ExistPhone.StartsWith(subscriber.DialingPrefix));
         }
 
-        private Tuple<AddSubscriberResult, FactSubscription> WasReAddedToList(ChannelType channelType, MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
+        private Tuple<AddSubscriberResult, IEnumerable<FactSubscription>> WasReAddedToList(ChannelType channelType, MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
         {
-            AddSubscriberResult result = null;
-            FactSubscription fact = null;
+            AddSubscriberResult result;
+            IEnumerable<FactSubscription> facts;
 
             try
             {
@@ -941,7 +987,7 @@ namespace WebDaoTests.LibTests
                         }
                     );
 
-                fact = LoadSubscriptions(result.SubscriberId, result.ListId).FirstOrDefault();
+                facts = LoadSubscriptions(result.SubscriberId, result.ListId);
             }
             catch (SubscriberManagerException ex)
             {
@@ -956,14 +1002,12 @@ namespace WebDaoTests.LibTests
             }
             
             Assert.IsNotNull(result);
-            if (result != null)
-            {
-                Assert.AreEqual(true, result.WasReAddedToList && result.SubscriberId > 0 && result.ListId == ActiveUnsubscribedApiListId);
-            }
+            Assert.AreEqual(true, result.WasReAddedToList && result.SubscriberId > 0 && result.ListId == ActiveUnsubscribedApiListId);
+            
+            Assert.IsNotNull(facts);
+            Assert.IsTrue(facts.Any());
 
-            Assert.IsNotNull(fact);
-
-            return new Tuple<AddSubscriberResult, FactSubscription>(result, fact);
+            return new Tuple<AddSubscriberResult, IEnumerable<FactSubscription>>(result, facts);
         }
         #endregion
 
@@ -1069,7 +1113,7 @@ namespace WebDaoTests.LibTests
             var fact = result.Item2.SingleOrDefault();
             if (fact != null)
             {
-                Assert.IsNull(fact.DomainId);
+                Assert.AreEqual(fact.DomainId, 0);
                 Assert.AreEqual(SubscriberIp, fact.ClientIp);
                 Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
 
@@ -1096,7 +1140,7 @@ namespace WebDaoTests.LibTests
             var fact = result.Item2.SingleOrDefault();
             if (fact != null)
             {
-                Assert.IsNull(fact.DomainId);
+                Assert.AreEqual(fact.DomainId, 0);
                 Assert.AreEqual(SubscriberIp, fact.ClientIp);
                 Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
 
@@ -1127,7 +1171,7 @@ namespace WebDaoTests.LibTests
             var fact = result.Item2.SingleOrDefault();
             if (fact != null)
             {
-                Assert.IsNull(fact.DomainId);
+                Assert.AreEqual(fact.DomainId, 0);
                 Assert.AreEqual(SubscriberIp, fact.ClientIp);
                 Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
 
@@ -1158,7 +1202,7 @@ namespace WebDaoTests.LibTests
             var fact = result.Item2.SingleOrDefault();
             if (fact != null)
             {
-                Assert.IsNull(fact.DomainId);
+                Assert.AreEqual(fact.DomainId, 0);
                 Assert.AreEqual(SubscriberIp, fact.ClientIp);
                 Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
 
@@ -1200,7 +1244,7 @@ namespace WebDaoTests.LibTests
             fact = facts.FirstOrDefault(f => f.ChannelTypeId == ChannelType.SmsMms);
             if (fact != null)
             {
-                Assert.IsNull(fact.DomainId);
+                Assert.AreEqual(fact.DomainId, 0);
                 Assert.AreEqual(SubscriberIp, fact.ClientIp);
                 Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
             }
@@ -1254,7 +1298,10 @@ namespace WebDaoTests.LibTests
             }
             catch (SubscriberManagerException ex)
             {
-                if (ifErrorConditition(ex))
+                if (ifErrorConditition == null)
+                    ifErrorConditition = exx => !(exx.FieldsErrors.Any() || exx.PropertiesErrors.Any());
+
+                if ( ifErrorConditition(ex))
                     throw ex;
             }
 
@@ -1317,7 +1364,7 @@ namespace WebDaoTests.LibTests
             var fact = result.Item2;
             if (fact != null)
             {
-                Assert.IsNull(fact.DomainId);
+                Assert.AreEqual(fact.DomainId, 0);
                 Assert.AreEqual(SubscriberIp, fact.ClientIp);
                 Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
 
@@ -1515,38 +1562,9 @@ namespace WebDaoTests.LibTests
         #region ChangeContacts
 
         [TestMethod]
-        public void AddSubscriber_Email_I_ChangeContacts_Test()
+        public void AddSubscriber_Email_I_ChangeContacts_NotSubscribed_Test()
         {
-            var result = ChangeContacts(ChannelType.SmsMms, MatchBy.Id, subscriberId: ExistSubscriberId, email: NotExistEmail);
-
-            Assert.AreEqual(NotExistEmail, result.Item1.SubscriberEmail);
-
-           var facts = result.Item2;
-            Assert.AreEqual(1, facts.Length);
-
-            var fact = facts.FirstOrDefault(f => f.ChannelTypeId == ChannelType.Email);
-            if (fact != null)
-            {
-                Assert.AreEqual(3, fact.DomainId);
-                Assert.AreEqual(SubscriberIp, fact.ClientIp);
-                Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
-
-                Assert.AreEqual(ChannelType.Email, fact.ChannelTypeId);
-            }
-
-            var subscriber = LoadSubscriber(result.Item1.SubscriberId);
-            Assert.IsNotNull(subscriber);
-
-            Assert.AreEqual(NotExistEmail, subscriber.Email);
-            Assert.AreEqual(NotExistMd5, CryptographyHelper.BytesToHexString(subscriber.EmailMd5).ToUpper());
-            Assert.AreEqual(fact.DomainId, subscriber.DomainId);
-            Assert.AreEqual(1000, subscriber.FamilyDomainId);
-        }
-
-        [TestMethod]
-        public void AddSubscriber_Email_D_ChangeContacts_Test()
-        {
-            var result = ChangeContacts(ChannelType.SmsMms, MatchBy.Email, emailMd5: ExistMd5, email: NotExistEmail);
+            var result = ChangeContacts(false, ChannelType.SmsMms, MatchBy.Id, subscriberId: ExistSubscriberId, email: NotExistEmail);
 
             Assert.AreEqual(NotExistEmail, result.Item1.SubscriberEmail);
 
@@ -1573,9 +1591,38 @@ namespace WebDaoTests.LibTests
         }
 
         [TestMethod]
-        public void AddSubscriber_Custom_EP_ChangeContacts_Test()
+        public void AddSubscriber_Email_D_ChangeContacts_NotSubscribed_Test()
         {
-            var result = ChangeContacts(ChannelType.SmsMms, MatchBy.CustomSubscriberId, customSubscriberId: ExistCustomSubscriberId, email: NotExistEmail, phone: NotExistPhone);
+            var result = ChangeContacts(false, ChannelType.SmsMms, MatchBy.Email, emailMd5: ExistMd5, email: NotExistEmail);
+
+            Assert.AreEqual(NotExistEmail, result.Item1.SubscriberEmail);
+
+            var facts = result.Item2;
+            Assert.AreEqual(1, facts.Length);
+
+            var fact = facts.FirstOrDefault(f => f.ChannelTypeId == ChannelType.Email);
+            if (fact != null)
+            {
+                Assert.AreEqual(3, fact.DomainId);
+                Assert.AreEqual(SubscriberIp, fact.ClientIp);
+                Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
+
+                Assert.AreEqual(ChannelType.Email, fact.ChannelTypeId);
+            }
+
+            var subscriber = LoadSubscriber(result.Item1.SubscriberId);
+            Assert.IsNotNull(subscriber);
+
+            Assert.AreEqual(NotExistEmail, subscriber.Email);
+            Assert.AreEqual(NotExistMd5, CryptographyHelper.BytesToHexString(subscriber.EmailMd5).ToUpper());
+            Assert.AreEqual(fact.DomainId, subscriber.DomainId);
+            Assert.AreEqual(1000, subscriber.FamilyDomainId);
+        }
+
+        [TestMethod]
+        public void AddSubscriber_Custom_EP_ChangeContacts_NotSubscribed_Test()
+        {
+            var result = ChangeContacts(false, ChannelType.SmsMms, MatchBy.CustomSubscriberId, customSubscriberId: ExistCustomSubscriberId, email: NotExistEmail, phone: NotExistPhone);
 
             Assert.AreEqual(NotExistEmail, result.Item1.SubscriberEmail);
 
@@ -1593,7 +1640,7 @@ namespace WebDaoTests.LibTests
             fact = facts.FirstOrDefault(f => f.ChannelTypeId == ChannelType.SmsMms);
             if (fact != null)
             {
-                Assert.IsNull(fact.DomainId);
+                Assert.AreEqual(fact.DomainId, 0);
                 Assert.AreEqual(SubscriberIp, fact.ClientIp);
                 Assert.AreEqual(SubscriptionSource.Api, fact.SubscriptionSourceId);
             }
@@ -1609,17 +1656,76 @@ namespace WebDaoTests.LibTests
             Assert.IsTrue(NotExistPhone.EndsWith(subscriber.PhoneLocal));
             Assert.IsTrue(NotExistPhone.StartsWith(subscriber.DialingPrefix));
         }
+        [TestMethod]
+        public void AddSubscriber_Email_I_ChangeContacts_Subscribed_Test()
+        {
+            var result = ChangeContacts(true, ChannelType.SmsMms, MatchBy.Id, subscriberId: ExistSubscriberId, email: NotExistEmail);
 
-        private Tuple<AddSubscriberResult, FactSubscription[]> ChangeContacts(ChannelType channelType, MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
+            Assert.AreEqual(NotExistEmail, result.Item1.SubscriberEmail);
+
+            var facts = result.Item2;
+            Assert.AreEqual(0, facts.Length);
+
+            var subscriber = LoadSubscriber(result.Item1.SubscriberId);
+            Assert.IsNotNull(subscriber);
+
+            Assert.AreEqual(NotExistEmail, subscriber.Email);
+            Assert.AreEqual(NotExistMd5, CryptographyHelper.BytesToHexString(subscriber.EmailMd5).ToUpper());
+            Assert.AreEqual(1000, subscriber.FamilyDomainId);
+        }
+
+        [TestMethod]
+        public void AddSubscriber_Email_D_ChangeContacts_Subscribed_Test()
+        {
+            var result = ChangeContacts(true, ChannelType.SmsMms, MatchBy.Email, emailMd5: ExistMd5, email: NotExistEmail);
+
+            Assert.AreEqual(NotExistEmail, result.Item1.SubscriberEmail);
+
+            var facts = result.Item2;
+            Assert.AreEqual(0, facts.Length);
+
+            var subscriber = LoadSubscriber(result.Item1.SubscriberId);
+            Assert.IsNotNull(subscriber);
+
+            Assert.AreEqual(NotExistEmail, subscriber.Email);
+            Assert.AreEqual(NotExistMd5, CryptographyHelper.BytesToHexString(subscriber.EmailMd5).ToUpper());
+            Assert.AreEqual(1000, subscriber.FamilyDomainId);
+        }
+
+        [TestMethod]
+        public void AddSubscriber_Custom_EP_ChangeContacts_Subscribed_Test()
+        {
+            var result = ChangeContacts(true, ChannelType.SmsMms, MatchBy.CustomSubscriberId, customSubscriberId: ExistCustomSubscriberId, email: NotExistEmail, phone: NotExistPhone);
+
+            Assert.AreEqual(NotExistEmail, result.Item1.SubscriberEmail);
+
+            var facts = result.Item2;
+            Assert.AreEqual(0, facts.Length);
+
+            var subscriber = LoadSubscriber(result.Item1.SubscriberId);
+
+            Assert.AreEqual(NotExistEmail, subscriber.Email);
+            Assert.AreEqual(NotExistMd5, CryptographyHelper.BytesToHexString(subscriber.EmailMd5).ToUpper());
+            Assert.AreEqual(3, subscriber.DomainId);
+            Assert.AreEqual(1000, subscriber.FamilyDomainId);
+
+            Assert.AreEqual(NotExistPhone, subscriber.Phone);
+            Assert.IsTrue(NotExistPhone.EndsWith(subscriber.PhoneLocal));
+            Assert.IsTrue(NotExistPhone.StartsWith(subscriber.DialingPrefix));
+        }
+
+        private Tuple<AddSubscriberResult, FactSubscription[]> ChangeContacts(bool addToSubscribed, ChannelType channelType, MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
         {
             AddSubscriberResult result = null;
             FactSubscription[] facts = null;
+
+            var listId = addToSubscribed ? ActiveSubscribedListId : ActiveNotSubscribedListId;
 
             try
             {
                 result = SM_AddAndUpdate(channelType, matchBy)
                     .AddSubscriber(
-                        ActiveNotSubscribedListId,
+                        listId,
                         id: subscriberId,
                         email: email,
                         emailMd5: emailMd5,
@@ -1647,13 +1753,9 @@ namespace WebDaoTests.LibTests
             }
 
             Assert.IsNotNull(result);
-            if (result != null)
-            {
-                Assert.AreEqual(true, result.WasAddedToList && result.SubscriberId == ExistSubscriberId && result.ListId == ActiveNotSubscribedListId);
-            }
+            Assert.AreEqual(true, (addToSubscribed || result.WasAddedToList) && result.SubscriberId == ExistSubscriberId && result.ListId == listId);
 
             Assert.IsNotNull(facts);
-            Assert.AreNotEqual(0, facts.Length);
 
             return new Tuple<AddSubscriberResult, FactSubscription[]>(result, facts);
         }
@@ -1776,6 +1878,365 @@ namespace WebDaoTests.LibTests
         }
         #endregion
 
+        #region Blacklisted_AddToNewList
+        
+        /// <summary>
+        /// Oba kanały są zblaklistowane globalnie
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(SubscriberManagerException))]
+        public void AddSubscriber_strictE_strictP_Blacklisted_AddToNewList_Test()
+        {
+            var blackListEmailDao = Container.GetInstance<IBlacklistedGlobalEmailDao>();
+            blackListEmailDao.Insert(new InsertBuilder("ES_TR_Common.dbo.BlacklistedGlobalEmail"), new ValuesBuilder(new
+            {
+                Id = 0,
+                CreatedOn = DateTime.Now,
+                Email = ExistEmail,
+                ExpirationDate = default(DateTime?),
+                Reason = "bo tak",
+                Source = BlacklistingSource.Ui
+            }));
+
+            var blackListPhoneDao = Container.GetInstance<IBlacklistedGlobalPhoneDao>();
+            blackListPhoneDao.Insert(new InsertBuilder("ES_TR_Common.dbo.BlacklistedGlobalPhone"), new ValuesBuilder(new
+            {
+                Id = 0,
+                CreatedOn = DateTime.Now,
+                Phone = ExistPhone,
+                ExpirationDate = default(DateTime?),
+                Reason = "bo tak",
+                Source = BlacklistingSource.Ui
+            }));
+
+            Blacklisted_AddToNewList(ChannelType.SmsMms, MatchBy.Id, subscriberId: ExistSubscriberId, email: ExistEmail, phone: ExistPhone, ifErrorConditition: ex =>
+                ex.FieldsErrors.Count == 2
+                && !ex.PropertiesErrors.Any()
+                && ex.FieldsErrors.Any(e => e.Key == "email" && e.Value.Contains(Resources.SubscriberManager.EmailGlobalBlacklist))
+                && ex.FieldsErrors.Any(e => e.Key == "phone" && e.Value.Contains(Resources.SubscriberManager.PhoneGlobalBlacklist))
+            );
+        }
+        
+        /// <summary>
+        /// Oba kanały są zblaklistowane globalnie; Email jest zblaklistowany przez domenę
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(SubscriberManagerException))]
+        public void AddSubscriber_domainE_strictP_Blacklisted_AddToNewList_Test()
+        {
+            var blackListDomainDao = Container.GetInstance<IBlacklistedGlobalDomainDao>();
+            blackListDomainDao.Insert(new InsertBuilder("ES_TR_Common.dbo.BlacklistedGlobalDomain"), new ValuesBuilder(new
+            {
+                Id = 0,
+                CreatedOn = DateTime.Now,
+                Domain = ExistEmail.Substring(ExistEmail.IndexOf('@') + 1),
+                Reason = "bo tak",
+                Source = BlacklistingSource.Ui
+            }));
+
+            var blackListPhoneDao = Container.GetInstance<IBlacklistedGlobalPhoneDao>();
+            blackListPhoneDao.Insert(new InsertBuilder("ES_TR_Common.dbo.BlacklistedGlobalPhone"), new ValuesBuilder(new
+            {
+                Id = 0,
+                CreatedOn = DateTime.Now,
+                Phone = ExistPhone,
+                ExpirationDate = default(DateTime?),
+                Reason = "bo tak",
+                Source = BlacklistingSource.Ui
+            }));
+
+            Blacklisted_AddToNewList(ChannelType.SmsMms, MatchBy.Id, subscriberId: ExistSubscriberId, email: ExistEmail, phone: ExistPhone, ifErrorConditition: ex =>
+                ex.FieldsErrors.Count == 2
+                && !ex.PropertiesErrors.Any()
+                && ex.FieldsErrors.Any(e => e.Key == "email" && e.Value.Contains(Resources.SubscriberManager.EmailGlobalBlacklist))
+                && ex.FieldsErrors.Any(e => e.Key == "phone" && e.Value.Contains(Resources.SubscriberManager.PhoneGlobalBlacklist))
+            );
+        }
+        
+        /// <summary>
+        /// Tylko Phone jest zblaklistowany globalnie
+        /// Sprawdzenie czy można dodać do listy dla kanału Email, ale nie można dodać Phone
+        /// </summary>
+        [TestMethod]
+        public void AddSubscriber_strictP_Blacklisted_AddToNewList_Test()
+        {
+            var blackListPhoneDao = Container.GetInstance<IBlacklistedGlobalPhoneDao>();
+            blackListPhoneDao.Insert(new InsertBuilder("ES_TR_Common.dbo.BlacklistedGlobalPhone"), new ValuesBuilder(new
+            {
+                Id = 0,
+                CreatedOn = DateTime.Now,
+                Phone = ExistPhone,
+                ExpirationDate = default(DateTime?),
+                Reason = "bo tak",
+                Source = BlacklistingSource.Ui
+            }));
+
+            var result = Blacklisted_AddToNewList(ChannelType.SmsMms, MatchBy.Id, subscriberId: ExistSubscriberId, email: ExistEmail, phone: ExistPhone);
+
+            Assert.AreEqual(true, result.WasAddedToList);
+            Assert.AreEqual(ExistEmail, result.SubscriberEmail);
+            Assert.AreEqual(result.SubscriberId, ExistSubscriberId);
+            Assert.AreEqual(result.ListId, ActiveNotSubscribedListId);
+
+            var subscriptions = LoadSubscriptions(result.SubscriberId, result.ListId);
+            Assert.IsNotNull(subscriptions);
+            Assert.AreEqual(1, subscriptions.Count());
+            Assert.AreEqual(ChannelType.Email, subscriptions.Single().ChannelTypeId);
+        }
+        
+        /// <summary>
+        /// Tylko Phone jest zblaklistowany globalnie
+        /// Sprawdzenie czy można dodać subskrybenta, czy można dodać do listy dla kanału Email, ale nie można dodać Phone
+        /// </summary>
+        [TestMethod]
+        public void AddSubscriber_matchE_strictP_NewSubscriber_Blacklisted_AddToNewList_Test()
+        {
+            var blackListPhoneDao = Container.GetInstance<IBlacklistedGlobalPhoneDao>();
+            blackListPhoneDao.Insert(new InsertBuilder("ES_TR_Common.dbo.BlacklistedGlobalPhone"), new ValuesBuilder(new
+            {
+                Id = 0,
+                CreatedOn = DateTime.Now,
+                Phone = NotExistPhone,
+                ExpirationDate = default(DateTime?),
+                Reason = "bo tak",
+                Source = BlacklistingSource.Ui
+            }));
+
+            var result = Blacklisted_AddToNewList(ChannelType.SmsMms, MatchBy.Email, email: NotExistEmail, phone: NotExistPhone);
+
+            Assert.AreEqual(result.WasAdded, true);
+            Assert.AreEqual(true, result.WasAddedToList);
+            Assert.AreEqual(NotExistEmail, result.SubscriberEmail);
+            Assert.AreEqual(result.ListId, ActiveNotSubscribedListId);
+
+            //Assert.AreEqual(result.SubscriberId, ExistSubscriberId);
+
+            var subscriber = LoadSubscriber(result.SubscriberId);
+
+            Assert.AreEqual(NotExistEmail, subscriber.Email);
+            Assert.AreEqual(NotExistPhone, subscriber.Phone);
+
+            var subscriptions = LoadSubscriptions(result.SubscriberId, result.ListId);
+            Assert.IsNotNull(subscriptions);
+            Assert.AreEqual(1, subscriptions.Count());
+            Assert.AreEqual(ChannelType.Email, subscriptions.Single().ChannelTypeId);
+        }
+        
+        /// <summary>
+        /// Tylko Phone jest zblaklistowany globalnie
+        /// Sprawdzenie czy można zmienić Email
+        /// </summary>
+        [TestMethod]
+        public void AddSubscriber_matchP_strictP_ChangeEmail_Blacklisted_AddToNewList_Test()
+        {
+            var blackListPhoneDao = Container.GetInstance<IBlacklistedGlobalPhoneDao>();
+            blackListPhoneDao.Insert(new InsertBuilder("ES_TR_Common.dbo.BlacklistedGlobalPhone"), new ValuesBuilder(new
+            {
+                Id = 0,
+                CreatedOn = DateTime.Now,
+                Phone = ExistPhone,
+                ExpirationDate = default(DateTime?),
+                Reason = "bo tak",
+                Source = BlacklistingSource.Ui
+            }));
+
+            var result = Blacklisted_AddToNewList(ChannelType.SmsMms, MatchBy.Phone, email: NotExistEmail, phone: ExistPhone);
+
+            Assert.AreEqual(true, result.WasAddedToList);
+            Assert.AreEqual(NotExistEmail, result.SubscriberEmail);
+            Assert.AreEqual(result.ListId, ActiveNotSubscribedListId);
+
+            var subscriber = LoadSubscriber(result.SubscriberId);
+
+            Assert.AreEqual(ExistPhone, subscriber.Phone);
+            Assert.AreEqual(NotExistEmail, subscriber.Email);
+
+            var subscriptions = LoadSubscriptions(result.SubscriberId, result.ListId);
+            Assert.IsNotNull(subscriptions);
+            Assert.AreEqual(1, subscriptions.Count());
+            Assert.AreEqual(ChannelType.Email, subscriptions.Single().ChannelTypeId);
+        }
+
+        private AddSubscriberResult Blacklisted_AddToNewList(ChannelType channelType, MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
+        {
+            AddSubscriberResult result = null;
+
+            try
+            {
+                result = SM_AddAndIgnore(channelType, matchBy)
+                    .AddSubscriber(
+                        ActiveNotSubscribedListId,
+                        id: subscriberId,
+                        email: email,
+                        emailMd5: emailMd5,
+                        phone: phone,
+                        customSubscriberId: customSubscriberId,
+                        firstName: SubscriberFirstname,
+                        lastName: SubscriberLastname,
+                        trackingCode: null,
+                        vendor: null,
+                        ip: SubscriberIp,
+                        propertiesDictionary: new Dictionary<int, object>
+                        {
+                            {RequiredPropertyString, "jakiś blok"},
+                            {RequiredPropertyInt, 7897987},
+                            {DeletedProperty, "jakiś blok"}
+                        }
+                    );
+            }
+            catch (SubscriberManagerException ex)
+            {
+                if (ifErrorConditition == null)
+                {
+                    ifErrorConditition = exx =>
+                        exx.PropertiesErrors.Any(e => e.Key == RequiredPropertyInt && e.Value.Contains(string.Format(Resources.SubscriberManager.InvalidValue, "cecha liczbowa xx3")));
+                }
+
+                if (ifErrorConditition(ex))
+                    throw ex;
+            }
+
+            return result;
+        }
+        #endregion
+
+        #region Blacklisted_AddToExistList
+        
+        /// <summary>
+        /// Tylko Phone jest zblaklistowany globalnie
+        /// Sprawdzenie czy nie usunie Phone z subskrypcji
+        /// </summary>
+        [TestMethod]
+        public void AddSubscriber_strictP_Blacklisted_AddToExistList_Test()
+        {
+            var blackListPhoneDao = Container.GetInstance<IBlacklistedGlobalPhoneDao>();
+            blackListPhoneDao.Insert(new InsertBuilder("ES_TR_Common.dbo.BlacklistedGlobalPhone"), new ValuesBuilder(new
+            {
+                Id = 0,
+                CreatedOn = DateTime.Now,
+                Phone = ExistPhone,
+                ExpirationDate = default(DateTime?),
+                Reason = "bo tak",
+                Source = BlacklistingSource.Ui
+            }));
+
+            var result = Blacklisted_AddToExistList(ChannelType.SmsMms, MatchBy.Id, subscriberId: ExistSubscriberId, email: NotExistEmail, phone: NotExistPhone);
+
+            Assert.AreEqual(result.WasAlreadyOnList, true);
+            Assert.AreEqual(result.RemovedChannels, ChannelType.NotSet);
+        }
+        
+        /// <summary>
+        /// Tylko Phone jest zblaklistowany globalnie
+        /// Sprawdzenie czy można zmienić Email
+        /// </summary>
+        [TestMethod]
+        public void AddSubscriber_matchP_strictP_ChangeEmail_Blacklisted_AddToExistList_Test()
+        {
+            var blackListPhoneDao = Container.GetInstance<IBlacklistedGlobalPhoneDao>();
+            blackListPhoneDao.Insert(new InsertBuilder("ES_TR_Common.dbo.BlacklistedGlobalPhone"), new ValuesBuilder(new
+            {
+                Id = 0,
+                CreatedOn = DateTime.Now,
+                Phone = ExistPhone,
+                ExpirationDate = default(DateTime?),
+                Reason = "bo tak",
+                Source = BlacklistingSource.Ui
+            }));
+
+            var result = Blacklisted_AddToExistList(ChannelType.SmsMms, MatchBy.Phone, email: NotExistEmail, phone: ExistPhone);
+
+            Assert.AreEqual(result.WasAlreadyOnList, true);
+            Assert.AreEqual(NotExistEmail, result.SubscriberEmail);
+            Assert.AreEqual(result.ListId, ActiveSubscribedListId);
+
+            var subscriber = LoadSubscriber(result.SubscriberId);
+            Assert.AreEqual(ExistPhone, subscriber.Phone);
+            Assert.AreEqual(NotExistEmail, subscriber.Email);
+
+            var subscriptions = LoadSubscriptions(result.SubscriberId, result.ListId);
+            Assert.IsNotNull(subscriptions);
+            Assert.AreEqual(0, subscriptions.Count());
+        }
+        
+        /// <summary>
+        /// Tylko Phone jest zblaklistowany globalnie
+        /// Sprawdzenie czy usunie subskrypcję Phone i zmieni subskrypcję Email
+        /// </summary>
+        [TestMethod]
+        public void AddSubscriber_matchP_strictP_Unubscribebliacklisted_Blacklisted_AddToExistList_Test()
+        {
+            var blackListPhoneDao = Container.GetInstance<IBlacklistedGlobalPhoneDao>();
+            blackListPhoneDao.Insert(new InsertBuilder("ES_TR_Common.dbo.BlacklistedGlobalPhone"), new ValuesBuilder(new
+            {
+                Id = 0,
+                CreatedOn = DateTime.Now,
+                Phone = NotExistPhone,
+                ExpirationDate = default(DateTime?),
+                Reason = "bo tak",
+                Source = BlacklistingSource.Ui
+            }));
+
+            var result = Blacklisted_AddToExistList(ChannelType.SmsMms, MatchBy.Id, subscriberId: ExistSubscriberId, email: NotExistEmail, phone: NotExistPhone);
+
+            Assert.AreEqual(result.WasAlreadyOnList, true);
+            Assert.AreEqual(NotExistEmail, result.SubscriberEmail);
+            Assert.AreEqual(result.ListId, ActiveSubscribedListId);
+
+            var subscriber = LoadSubscriber(result.SubscriberId);
+            Assert.AreEqual(subscriber.Phone, NotExistPhone);
+            Assert.AreEqual(NotExistEmail, subscriber.Email);
+
+            Assert.AreEqual(result.RemovedChannels & ChannelType.SmsMms, ChannelType.SmsMms);
+
+            var subscriptions = LoadSubscriptions(result.SubscriberId, result.ListId);
+            Assert.IsNotNull(subscriptions);
+            Assert.AreEqual(0, subscriptions.Count());
+        }
+
+        private AddSubscriberResult Blacklisted_AddToExistList(ChannelType channelType, MatchBy matchBy, int? subscriberId = null, string email = null, string emailMd5 = null, string phone = null, string customSubscriberId = null, Func<SubscriberManagerException, bool> ifErrorConditition = null)
+        {
+            AddSubscriberResult result = null;
+
+            try
+            {
+                result = SM_AddAndReplace(channelType, matchBy)
+                    .AddSubscriber(
+                        ActiveSubscribedListId,
+                        id: subscriberId,
+                        email: email,
+                        emailMd5: emailMd5,
+                        phone: phone,
+                        customSubscriberId: customSubscriberId,
+                        firstName: SubscriberFirstname,
+                        lastName: SubscriberLastname,
+                        trackingCode: null,
+                        vendor: null,
+                        ip: SubscriberIp,
+                        propertiesDictionary: new Dictionary<int, object>
+                        {
+                            {RequiredPropertyString, "jakiś blok"},
+                            {RequiredPropertyInt, 7897987},
+                            {DeletedProperty, "jakiś blok"}
+                        }
+                    );
+            }
+            catch (SubscriberManagerException ex)
+            {
+                if (ifErrorConditition == null)
+                {
+                    ifErrorConditition = exx =>
+                        exx.PropertiesErrors.Any(e => e.Key == RequiredPropertyInt && e.Value.Contains(string.Format(Resources.SubscriberManager.InvalidValue, "cecha liczbowa xx3")));
+                }
+
+                if (ifErrorConditition(ex))
+                    throw ex;
+            }
+
+            return result;
+        }
+        #endregion
+
         #region GetSubscriberManager
 
         private SubscriberManager SM_AddAndIgnore(ChannelType channelType, MatchBy matchBy)
@@ -1874,6 +2335,7 @@ namespace WebDaoTests.LibTests
             var select = new SelectBuilder("Id,DateTimeId,DomainId,ListId,ClientIP,SubscriptionSourceId,ChannelTypeId")
                 .From(factSubscriptionsTable)
                 .Where(new {SubscriberId = subscriberId, ListId = listId})
+                .Where("DateTimeId>={0}", new { DateTimeId = DateTime.Now.AddDays(-1)})// interesują nas tylko nowo dodane subskrypcje
                 .MainClause;
 
             var results = dao.SelectMany((SelectBuilder)select).Select(f => new FactSubscription
