@@ -74,11 +74,11 @@ namespace BackendDaoTests.Tests
 
         private void GetSubscriptionTest()
         {
-            var yes = _dao.GetSubscription(15, 1);
-            var both = _dao.GetSubscription(15, 2);
-            var subscriber = _dao.GetSubscription(15, 0);
-            var list = _dao.GetSubscription(0, 1);
-            var none = _dao.GetSubscription(0, 0);
+            //var yes = _dao.GetSubscription(15, 1);
+            //var both = _dao.GetSubscription(15, 2);
+            //var subscriber = _dao.GetSubscription(15, 0);
+            //var list = _dao.GetSubscription(0, 1);
+            //var none = _dao.GetSubscription(0, 0);
         }
 
         #region Use

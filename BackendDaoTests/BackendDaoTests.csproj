@@ -72,26 +72,29 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\vso\ExpertSender 2 MultiChannel\Dev\Src\ExpertSender.Backend.DAL\ExpertSender.Backend.DAL.csproj">
-      <Project>{40395cf0-4284-484c-a898-0d2dbb7fda28}</Project>
+    <ProjectReference Include="..\..\..\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.Backend.DAL\ExpertSender.Backend.DAL.csproj">
+      <Project>{2722acd8-8c8a-440d-9415-abac8c361c9c}</Project>
       <Name>ExpertSender.Backend.DAL</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\vso\ExpertSender 2 MultiChannel\Dev\Src\ExpertSender.Backend.Host\ExpertSender.Backend.Host.csproj">
-      <Project>{ee1c3aac-f15e-473f-ac57-3c1be095976b}</Project>
+    <ProjectReference Include="..\..\..\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.Backend.Host\ExpertSender.Backend.Host.csproj">
+      <Project>{c9e6bcdd-892d-4123-9859-c529a22f0ccf}</Project>
       <Name>ExpertSender.Backend.Host</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\vso\ExpertSender 2 MultiChannel\Dev\Src\ExpertSender.Common\ExpertSender.Common.csproj">
-      <Project>{da5092d0-2ede-4a48-a5e3-61a10258bc0d}</Project>
+    <ProjectReference Include="..\..\..\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.Common\ExpertSender.Common.csproj">
+      <Project>{58cc1440-50b4-41c8-98f4-d259250fc53e}</Project>
       <Name>ExpertSender.Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\vso\ExpertSender 2 MultiChannel\Dev\Src\ExpertSender.DataModel\ExpertSender.DataModel.csproj">
-      <Project>{9f7b8e72-cf1b-4724-a631-5af91902ebbb}</Project>
+    <ProjectReference Include="..\..\..\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.DataModel\ExpertSender.DataModel.csproj">
+      <Project>{f366dec6-9e94-440c-aa52-813e2f477fe6}</Project>
       <Name>ExpertSender.DataModel</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\vso\ExpertSender 2 MultiChannel\Dev\Src\ExpertSender.Lib\ExpertSender.Lib.csproj">
-      <Project>{aea663d6-55d8-4331-aa3e-705d9a26ca57}</Project>
+    <ProjectReference Include="..\..\..\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.Lib\ExpertSender.Lib.csproj">
+      <Project>{45e2fd1f-80b2-4053-9ed6-07eb481ad834}</Project>
       <Name>ExpertSender.Lib</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

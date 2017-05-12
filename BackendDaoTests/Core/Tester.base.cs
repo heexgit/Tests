@@ -8,7 +8,7 @@ using StructureMap;
 
 namespace BackendDaoTests.Core
 {
-    internal abstract class Tester : IDisposable
+    public abstract class Tester : IDisposable
     {
         protected IContainer Container { get; private set; }
 

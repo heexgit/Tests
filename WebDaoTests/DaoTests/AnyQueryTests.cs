@@ -1,10 +1,17 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using ExpertSender.Common.Dao;
+using ExpertSender.Common.Extensions;
+using ExpertSender.Common.QueryBuilder;
 using ExpertSender.DataModel;
 using ExpertSender.DataModel.Dao;
+using ExpertSender.DataModel.Enums;
+using ExpertSender.Lib;
+using MaxMind.GeoIP2;
 using NHibernate;
 using WebDaoTests.Core;
 using EsAppContext = WebDaoTests.Mocks.EsAppContext;
@@ -23,8 +30,11 @@ namespace WebDaoTests.DaoTests
         {
             //GetCacheStatusTest();
             //LoadListSettingDictionary();
-            LoadSubscribedOn();
+            //LoadSubscribedOn();
             //ChangeSubscribedOn();
+            //CompareSingleFirst();
+            //SaveGeoinfo();
+            ExistsTest();
         }
 
         private void GetCacheStatusTest()
@@ -70,7 +80,7 @@ namespace WebDaoTests.DaoTests
         /// <param name="transaction"></param>
         /// <param name="timeout"></param>
         /// <returns></returns>
-        private int GetCacheStatus(byte[] hashKey, SqlConnection connection, SqlTransaction transaction, int timeout)
+        private static int GetCacheStatus(byte[] hashKey, SqlConnection connection, SqlTransaction transaction, int timeout)
         {
             const string selectQueryStatus =
                 @"SELECT
@@ -133,6 +143,91 @@ namespace WebDaoTests.DaoTests
 
             var ses = Container.GetInstance<ISession>();
             ses.Flush();
+        }
+
+        private void CompareSingleFirst()
+        {
+            var dao = Container.GetInstance<IWebDao<Subscriber>>();
+
+            var subs = dao.Find(s => new
+            {
+                s.Id,
+                s.Email,
+                s.Firstname,
+                s.Lastname
+            }, s => s.Email == "andrzej@duda.pl");
+
+            try
+            {
+                var single = subs.Single();
+            }
+            catch (Exception)
+            { }
+
+            try
+            {
+                var singleOrDefault = subs.SingleOrDefault();
+            }
+            catch (Exception)
+            { }
+
+            try
+            {
+                var first = subs.First();
+            }
+            catch (Exception)
+            { }
+
+            try
+            {
+                var firstOrDefault = subs.FirstOrDefault();
+            }
+            catch (Exception)
+            { }
+        }
+
+        private void SaveGeoinfo()
+        {
+            var goinfoDao = Container.GetInstance<ISubscriberGeoinfoDao>();
+            var maxmind = Container.GetInstance<DatabaseReader>();
+
+            const string ipAddress = "87.206.135.48";
+            const int subscriberId = 84803;
+
+            try
+            {
+               var geoinfo = maxmind.City(ipAddress);
+
+                goinfoDao.Store(
+                    subscriberId,
+                    country: geoinfo.Country.IsoCode.Truncate(2),
+                    city: geoinfo.City.Name.Truncate(200),
+                    zipCode: geoinfo.Postal.Code.Truncate(10),
+                    state: geoinfo.MostSpecificSubdivision.IsoCode.Truncate(3),
+                    continent: GeoHelper.GetContinentByCode(geoinfo.Continent.Code),
+                    timezoneId: TimeZoneHelper.GetTimezone(geoinfo.Location.TimeZone, Container),
+                    metroCode: geoinfo.Location.MetroCode,
+                    latitude: geoinfo.Location.Latitude,
+                    longitude: geoinfo.Location.Longitude
+                );
+            }
+            catch (HibernateException)
+            {
+                // inne błędy zapisu należy rzucić dalej
+                throw;
+            }
+            catch (Exception)
+            {
+                // błedy maxminda są ignorowane - to nie jest krytyczny kod
+            }
+        }
+
+        private void ExistsTest()
+        {
+            var dao = Container.GetInstance<IMessageDao>().Use(CurrentUnitId);
+
+            var resultFalse = dao.Exists(1);
+            var resultTrue = dao.Exists(4);
         }
     }
 }

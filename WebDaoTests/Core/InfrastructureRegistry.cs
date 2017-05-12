@@ -23,6 +23,7 @@ namespace WebDaoTests.Core
             For<ICacheProvider>().Use<AppFabricCacheProvider>().SetProperty(c => c.SetConfig(new AppFabricCacheConfig()));
             For<IMemoryCacheProvider>().Use<MemoryCacheProvider>();
             For<IMemoryStaticCacheProvider>().Use<MemoryCacheProvider>();
+            For(typeof(ICacheProxy<>)).Use(typeof(SpecializedCacheProxy<>));
 
             // obiekt czytający dane z bazy MaxMind jest kosztowny, więc trzymamy go w pamięci
             For<DatabaseReader>().Singleton().Use(ctx => new DatabaseReader(MachineConfig.GetSetting(ColocationSetting.MaxMindDB, true), 0));
