@@ -34,7 +34,8 @@ namespace WebDaoTests.DaoTests
             //ChangeSubscribedOn();
             //CompareSingleFirst();
             //SaveGeoinfo();
-            ExistsTest();
+            //ExistsTest();
+            LoadComplexObject();
         }
 
         private void GetCacheStatusTest()
@@ -228,6 +229,44 @@ namespace WebDaoTests.DaoTests
 
             var resultFalse = dao.Exists(1);
             var resultTrue = dao.Exists(4);
+        }
+
+        private void LoadComplexObject()
+        {
+            var dao = Container.GetInstance<IAutoresponderDao>().Use(CurrentUnitId);
+
+            var messages1 = dao.Find(m => new {
+                Id = m.Id,
+                Subject = m.Contents.Where(mc => mc.IsDeleted == false && mc.Subject != string.Empty).Select(mc => mc.Subject).FirstOrDefault(),
+                IsAttachments = m.Attachments.Any(a => a.IsInline == false),
+                Interval = m.Interval,
+                Counters = m.Counters,
+                IsEdm = m.Contents.Any(c => c.Source == ContentSource.EdmDesigner),
+                HasEmailTests = m.EmailTests.Any()
+            }, m => m.IsActive);
+
+            var filtered1 = messages1.Where(m => m.Counters != null);
+
+            var one1 = filtered1.FirstOrDefault();
+
+
+            var messages2 = dao.Find(m => new
+            {
+                Id = m.Id,
+                Subject = m.Contents.Where(mc => mc.IsDeleted == false && mc.Subject != string.Empty).Select(mc => mc.Subject).FirstOrDefault(),
+                IsAttachments = m.Attachments.Any(a => a.IsInline == false),
+                Interval = m.Interval,
+                Sent = m.Counters.Sent,
+                Bounces = m.Counters.Bounces,
+                Opens = m.Counters.Opens,
+                Clicks = m.Counters.Clicks,
+                IsEdm = m.Contents.Any(c => c.Source == ContentSource.EdmDesigner),
+                HasEmailTests = m.EmailTests.Any()
+            }, m => m.IsActive);
+
+            var filtered2 = messages2.Where(m => m.Sent > 0);
+
+            var one2 = filtered2.FirstOrDefault();
         }
     }
 }
