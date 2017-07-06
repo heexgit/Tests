@@ -7,21 +7,21 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebDaoTests", "WebDaoTests\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dev.ExpertSender", "Dev.ExpertSender", "{A637231F-B229-4838-B384-B891840B577D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpertSender.Common", "..\..\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.Common\ExpertSender.Common.csproj", "{58CC1440-50B4-41C8-98F4-D259250FC53E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpertSender.Common", "D:\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.Common\ExpertSender.Common.csproj", "{58CC1440-50B4-41C8-98F4-D259250FC53E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpertSender.DataModel", "..\..\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.DataModel\ExpertSender.DataModel.csproj", "{F366DEC6-9E94-440C-AA52-813E2F477FE6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpertSender.DataModel", "D:\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.DataModel\ExpertSender.DataModel.csproj", "{F366DEC6-9E94-440C-AA52-813E2F477FE6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpertSender.DAL", "..\..\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.DAL\ExpertSender.DAL.csproj", "{747F4AE2-FC01-4A2C-B8BC-61E2D0B875FB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpertSender.DAL", "D:\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.DAL\ExpertSender.DAL.csproj", "{747F4AE2-FC01-4A2C-B8BC-61E2D0B875FB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpertSender.Lib", "..\..\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.Lib\ExpertSender.Lib.csproj", "{45E2FD1F-80B2-4053-9ED6-07EB481AD834}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpertSender.Lib", "D:\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.Lib\ExpertSender.Lib.csproj", "{45E2FD1F-80B2-4053-9ED6-07EB481AD834}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonTests", "CommonTests\CommonTests.csproj", "{956A0E50-9379-4C5D-BC3A-716473E8F6A6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackendDaoTests", "BackendDaoTests\BackendDaoTests.csproj", "{4A5BC10C-3D6F-4D66-B226-7C3563E40A72}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpertSender.Backend.DAL", "..\..\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.Backend.DAL\ExpertSender.Backend.DAL.csproj", "{2722ACD8-8C8A-440D-9415-ABAC8C361C9C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpertSender.Backend.DAL", "D:\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.Backend.DAL\ExpertSender.Backend.DAL.csproj", "{2722ACD8-8C8A-440D-9415-ABAC8C361C9C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpertSender.Backend.Host", "..\..\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.Backend.Host\ExpertSender.Backend.Host.csproj", "{C9E6BCDD-892D-4123-9859-C529A22F0CCF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpertSender.Backend.Host", "D:\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.Backend.Host\ExpertSender.Backend.Host.csproj", "{C9E6BCDD-892D-4123-9859-C529A22F0CCF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MainBackendDaoTests", "MainBackendDaoTests\MainBackendDaoTests.csproj", "{F6A1B41B-E123-49ED-87D1-3922D7430F8C}"
 EndProject
@@ -29,21 +29,21 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonRuns", "LibTests\Comm
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Multi.ExpertSender", "Multi.ExpertSender", "{D600CA32-78F3-4A47-8E21-289245784E11}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpertSender.Backend.DAL", "..\..\vso\ExpertSender 2 MultiChannel\Dev\Src\ExpertSender.Backend.DAL\ExpertSender.Backend.DAL.csproj", "{40395CF0-4284-484C-A898-0D2DBB7FDA28}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpertSender.Backend.DAL", "D:\vso\ExpertSender 2 MultiChannel\Dev\Src\ExpertSender.Backend.DAL\ExpertSender.Backend.DAL.csproj", "{40395CF0-4284-484C-A898-0D2DBB7FDA28}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpertSender.Common", "..\..\vso\ExpertSender 2 MultiChannel\Dev\Src\ExpertSender.Common\ExpertSender.Common.csproj", "{5386B374-0764-4354-AF05-7E847008A500}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpertSender.Common", "D:\vso\ExpertSender 2 MultiChannel\Dev\Src\ExpertSender.Common\ExpertSender.Common.csproj", "{5386B374-0764-4354-AF05-7E847008A500}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpertSender.Core", "..\..\vso\ExpertSender 2 MultiChannel\Dev\Src\ExpertSender.Core\ExpertSender.Core.csproj", "{D036F83B-278F-46AA-BCCD-F07CEC53F486}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpertSender.Core", "D:\vso\ExpertSender 2 MultiChannel\Dev\Src\ExpertSender.Core\ExpertSender.Core.csproj", "{D036F83B-278F-46AA-BCCD-F07CEC53F486}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpertSender.DAL", "..\..\vso\ExpertSender 2 MultiChannel\Dev\Src\ExpertSender.DAL\ExpertSender.DAL.csproj", "{150602E1-6EFA-42EF-BC41-B912A82F48C5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpertSender.DAL", "D:\vso\ExpertSender 2 MultiChannel\Dev\Src\ExpertSender.DAL\ExpertSender.DAL.csproj", "{150602E1-6EFA-42EF-BC41-B912A82F48C5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpertSender.DataModel", "..\..\vso\ExpertSender 2 MultiChannel\Dev\Src\ExpertSender.DataModel\ExpertSender.DataModel.csproj", "{9F7B8E72-CF1B-4724-A631-5AF91902EBBB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpertSender.DataModel", "D:\vso\ExpertSender 2 MultiChannel\Dev\Src\ExpertSender.DataModel\ExpertSender.DataModel.csproj", "{9F7B8E72-CF1B-4724-A631-5AF91902EBBB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpertSender.Lib", "..\..\vso\ExpertSender 2 MultiChannel\Dev\Src\ExpertSender.Lib\ExpertSender.Lib.csproj", "{AEA663D6-55D8-4331-AA3E-705D9A26CA57}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpertSender.Lib", "D:\vso\ExpertSender 2 MultiChannel\Dev\Src\ExpertSender.Lib\ExpertSender.Lib.csproj", "{AEA663D6-55D8-4331-AA3E-705D9A26CA57}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Multi.WebDaoTests", "Multi.WebDaoTests\Multi.WebDaoTests.csproj", "{5B76CEF2-06A7-4F56-AD28-203C502904C8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpertSender.Backend.Host", "..\..\vso\ExpertSender 2 MultiChannel\Dev\Src\ExpertSender.Backend.Host\ExpertSender.Backend.Host.csproj", "{EE1C3AAC-F15E-473F-AC57-3C1BE095976B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpertSender.Backend.Host", "D:\vso\ExpertSender 2 MultiChannel\Dev\Src\ExpertSender.Backend.Host\ExpertSender.Backend.Host.csproj", "{EE1C3AAC-F15E-473F-AC57-3C1BE095976B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

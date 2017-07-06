@@ -72,23 +72,23 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.Backend.DAL\ExpertSender.Backend.DAL.csproj">
+    <ProjectReference Include="D:\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.Backend.DAL\ExpertSender.Backend.DAL.csproj">
       <Project>{2722acd8-8c8a-440d-9415-abac8c361c9c}</Project>
       <Name>ExpertSender.Backend.DAL</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.Backend.Host\ExpertSender.Backend.Host.csproj">
+    <ProjectReference Include="D:\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.Backend.Host\ExpertSender.Backend.Host.csproj">
       <Project>{c9e6bcdd-892d-4123-9859-c529a22f0ccf}</Project>
       <Name>ExpertSender.Backend.Host</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.Common\ExpertSender.Common.csproj">
+    <ProjectReference Include="D:\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.Common\ExpertSender.Common.csproj">
       <Project>{58cc1440-50b4-41c8-98f4-d259250fc53e}</Project>
       <Name>ExpertSender.Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.DataModel\ExpertSender.DataModel.csproj">
+    <ProjectReference Include="D:\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.DataModel\ExpertSender.DataModel.csproj">
       <Project>{f366dec6-9e94-440c-aa52-813e2f477fe6}</Project>
       <Name>ExpertSender.DataModel</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.Lib\ExpertSender.Lib.csproj">
+    <ProjectReference Include="D:\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.Lib\ExpertSender.Lib.csproj">
       <Project>{45e2fd1f-80b2-4053-9ed6-07eb481ad834}</Project>
       <Name>ExpertSender.Lib</Name>
     </ProjectReference>

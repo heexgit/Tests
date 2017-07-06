@@ -1,5 +1,6 @@
 ﻿using WebDaoTests.DaoTests;
 using WebDaoTests.LibTests;
+using WebDaoTests.SomeTests;
 
 namespace WebDaoTests
 {
@@ -7,7 +8,7 @@ namespace WebDaoTests
     {
         private static void Main()
         {
-            new AnyQueryTests().Start();
+            //new AnyQueryTests().Start();
             //new SubscriberDaoTests().Start();
             //new StructureMapTests().Start();
             //new UserDaoTests().Start();
@@ -16,6 +17,7 @@ namespace WebDaoTests
             //new DomainDaoTests().Start();
             //new TagDaoTests().Start();
             //new SubscriberManagerTests().Start();
+            new VariousTests().Start();
         }
     }
 }

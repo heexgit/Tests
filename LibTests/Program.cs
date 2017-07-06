@@ -13,7 +13,8 @@ namespace CommonRuns
             //_modelsRegister = new ModelsRegister();
             //var link = GetClickLink();
             //new LockTests().Start();
-            new ReflectionTests.ReflectionHelperTests().Start();
+            //new ReflectionTests.ReflectionHelperTests().Start();
+            new Tests.LanguageTests().Start();
 
             Console.WriteLine("Press any key");
             Console.ReadKey();

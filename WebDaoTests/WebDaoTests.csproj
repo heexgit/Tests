@@ -91,6 +91,7 @@
     <Compile Include="DaoTests\TagDaoTests.cs" />
     <Compile Include="DaoTests\UserDaoTests.cs" />
     <Compile Include="LibTests\SubscriberManagerTests.cs" />
+    <Compile Include="SomeTests\VariousTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
@@ -105,19 +106,19 @@
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.Common\ExpertSender.Common.csproj">
+    <ProjectReference Include="D:\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.Common\ExpertSender.Common.csproj">
       <Project>{58cc1440-50b4-41c8-98f4-d259250fc53e}</Project>
       <Name>ExpertSender.Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.DAL\ExpertSender.DAL.csproj">
+    <ProjectReference Include="D:\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.DAL\ExpertSender.DAL.csproj">
       <Project>{747f4ae2-fc01-4a2c-b8bc-61e2d0b875fb}</Project>
       <Name>ExpertSender.DAL</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.DataModel\ExpertSender.DataModel.csproj">
+    <ProjectReference Include="D:\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.DataModel\ExpertSender.DataModel.csproj">
       <Project>{f366dec6-9e94-440c-aa52-813e2f477fe6}</Project>
       <Name>ExpertSender.DataModel</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.Lib\ExpertSender.Lib.csproj">
+    <ProjectReference Include="D:\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.Lib\ExpertSender.Lib.csproj">
       <Project>{45e2fd1f-80b2-4053-9ed6-07eb481ad834}</Project>
       <Name>ExpertSender.Lib</Name>
     </ProjectReference>

@@ -47,6 +47,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReflectionTests\Inherit.models.cs" />
+    <Compile Include="Tests\LanguageTests.cs" />
     <Compile Include="Tests\LockTests.cs" />
     <Compile Include="ReflectionTests\ReflectionHelperTests.cs" />
   </ItemGroup>
@@ -54,11 +55,11 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.Common\ExpertSender.Common.csproj">
+    <ProjectReference Include="D:\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.Common\ExpertSender.Common.csproj">
       <Project>{58cc1440-50b4-41c8-98f4-d259250fc53e}</Project>
       <Name>ExpertSender.Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.DataModel\ExpertSender.DataModel.csproj">
+    <ProjectReference Include="D:\vso\ExpertSender 2\Dev\Dev\Src\ExpertSender.DataModel\ExpertSender.DataModel.csproj">
       <Project>{f366dec6-9e94-440c-aa52-813e2f477fe6}</Project>
       <Name>ExpertSender.DataModel</Name>
     </ProjectReference>
