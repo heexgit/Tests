@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Linq.Expressions;
 using ExpertSender.Common.Dao;
+using ExpertSender.DataModel.Dao;
 using ExpertSender.DataModel;
 using ExpertSender.DataModel.Enums;
 using NHibernate;
@@ -21,7 +22,17 @@ namespace WebDaoTests.SomeTests
 
         public override void Start()
         {
-            AnyVsCount();
+            //AnyVsCount();
+            //DataTables();
+            EnurableVsQueryable();
+        }
+
+        private void DataTables()
+        {
+            var datatebleDao = Container.GetInstance<IDataTableDao>();
+            var column = datatebleDao.GetTableColumn(8);
+            var table = column.SourceTable;
+            var relationships = table.Relationships;
         }
 
         private void AnyVsCount()
@@ -61,6 +72,22 @@ namespace WebDaoTests.SomeTests
                 .Where(filter)
                 .Select(e => e.Id)
                 .Any();
+        }
+
+        private void EnurableVsQueryable()
+        {
+            var sess = Container.GetInstance<ISession>();
+
+            var qResult = sess.Query<List>().Where(l => l.Id == 11).Select(l => l.Name);// sql not executed
+            var qFirst = qResult.FirstOrDefault();
+
+            var eResult1 = sess.Query<List>().AsEnumerable().Where(l => l.Id == 12).Select(l => l.Name);// sql not executed
+            var eFirst1 = eResult1.FirstOrDefault();
+            var eResult2 = sess.Query<List>().Where(l => l.Id == 13).Select(l => l.Name).AsEnumerable();// sql not executed
+            var eFirst2 = eResult2.FirstOrDefault();
+
+            var lResult = sess.Query<List>().Where(l => l.Id == 14).Select(l => l.Name).ToList();// sql DO executed
+            var lFirst = lResult.FirstOrDefault();
         }
     }
 }
